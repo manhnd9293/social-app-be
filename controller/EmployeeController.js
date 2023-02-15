@@ -2,6 +2,7 @@ const {EmployeeService} = require("../services/employee/EmployeeService");
 const { uploadS3 } = require("../config/aws/aws");
 const {uploadAvatar} = require("../config/uploadFile");
 const fs = require("fs");
+const {AwsS3} = require("../config/aws/s3/s3Config");
 let router = require('express').Router();
 
 router.get('/', async (req, res) => {
@@ -29,7 +30,7 @@ router.post('/', async (req, res) => {
 router.patch('/upload', uploadAvatar.single('file') ,async (req, res) => {
   const file = req.file;
   let filePath = file.path;
-  uploadS3(filePath).then(data => {
+  AwsS3.upload(filePath).then(data => {
     console.log({data})
     res.send({
       message: 'success',
@@ -41,6 +42,7 @@ router.patch('/upload', uploadAvatar.single('file') ,async (req, res) => {
       console.log('file deleted successfully');
     });
   });
-
 })
+
+
 module.exports = {EmployeeController: router}
