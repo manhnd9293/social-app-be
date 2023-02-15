@@ -1,0 +1,17 @@
+version: '3.8'
+
+volumes:
+  test_bulma_data:
+    name: test_bulma_data
+
+services:
+  mongo:
+    image: mongo
+    container_name: test_bulma_db
+    environment:
+      MONGO_INITDB_DATABASE: test_bulma
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - '27019:27017'
+
