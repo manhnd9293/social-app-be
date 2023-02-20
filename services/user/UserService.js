@@ -1,6 +1,7 @@
 const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+const {aws} = require("../../config/aws/aws");
 
 
 class UserService {
@@ -62,6 +63,12 @@ class UserService {
     })
 
     return token;
+  }
+
+  async checkUsername(username) {
+    const user = await UserModel.findOne({username}).lean();
+
+    return !!user;
   }
 }
 

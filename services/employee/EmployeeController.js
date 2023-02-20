@@ -1,8 +1,8 @@
-const {EmployeeService} = require("../services/employee/EmployeeService");
-const { uploadS3 } = require("../config/aws/aws");
-const {uploadAvatar} = require("../config/uploadFile");
+const {EmployeeService} = require("./EmployeeService");
+const { uploadS3 } = require("../../config/aws/aws");
+const {uploadAvatar} = require("../../config/uploadFile");
 const fs = require("fs");
-const {AwsS3} = require("../config/aws/s3/s3Config");
+const {AwsS3} = require("../../config/aws/s3/s3Config");
 let router = require('express').Router();
 
 router.get('/', async (req, res) => {

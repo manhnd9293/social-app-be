@@ -1,5 +1,5 @@
-const {EmployeeController} = require("../controller/EmployeeController");
-const {UserController} = require("../controller/UserController");
+const {EmployeeController} = require("../services/employee/EmployeeController");
+const {UserController} = require("../services/user/UserController");
 const router = require('express').Router();
 
 router.use('/employee', EmployeeController)

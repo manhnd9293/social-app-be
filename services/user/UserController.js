@@ -1,5 +1,5 @@
-const {UserService} = require("../services/user/UserService");
-const {verifyToken} = require("../middlewares/jwtAuth");
+const {UserService} = require("./UserService");
+const {verifyToken} = require("../../middlewares/jwtAuth");
 const router = require('express').Router();
 
 router.post('/sign-in', async (req, res) => {
@@ -34,6 +34,17 @@ router.get('/me',verifyToken ,async (req, res) => {
     res.send({data});
   })
 
+})
+
+router.get('/check-username-exist', async (req,res) => {
+  const {username} = req.query;
+  UserService.checkUsername(username).then(data => {
+    res.send({
+      data: {
+        exist: data
+      }
+    })
+  })
 })
 
 module.exports = {UserController: router}
