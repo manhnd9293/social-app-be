@@ -1,5 +1,7 @@
 const {UserService} = require("./UserService");
 const {verifyToken} = require("../../middlewares/jwtAuth");
+const {HttpError} = require("../../utils/HttpError");
+const http = require("http");
 const router = require('express').Router();
 
 router.post('/sign-in', async (req, res) => {
@@ -45,6 +47,18 @@ router.get('/check-username-exist', async (req,res) => {
       }
     })
   })
+})
+
+router.get('/test', async (req, res, next) => {
+  // throw 'Invalid request';
+  UserService.testError().then(()=>{
+    res.json({
+      data: 'success'
+    })
+  }).catch(e =>{
+    next(e);
+  });
+
 })
 
 module.exports = {UserController: router}

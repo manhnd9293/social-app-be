@@ -1,7 +1,7 @@
 const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
-const {aws} = require("../../config/aws/aws");
+const { httpError} = require("../../utils/HttpError");
 
 
 class UserService {
@@ -69,6 +69,11 @@ class UserService {
     const user = await UserModel.findOne({username}).lean();
 
     return !!user;
+  }
+
+  async testError() {
+    await UserModel.findOne({});
+    throw httpError.badRequest('User existed');
   }
 }
 
