@@ -1,6 +1,12 @@
-class HttpError {
+class HttpError extends Error {
+
+  constructor(messageData) {
+    super();
+    this.messageData = messageData;
+  }
+
   badRequest(message) {
-    return Error(JSON.stringify({status: 400, message}));
+    return new HttpError({status: 400, message});
   }
 }
 
@@ -9,13 +15,14 @@ function errorHandler(err, req, res, next) {
 
   if(err instanceof HttpError) {
     //handle user define error
-    const {status, message} = JSON.parse(err.message);
+    const {status, message} = err.messageData;
     res.status(Number(status) || 500)
       .json({
         status: status || 500,
         message: (message || 'Some thing went wrong')
       });
-    next()
+    next();
+    return;
   }
 
   // handle system error
