@@ -16,7 +16,7 @@ class UserService {
   async login(username, password) {
     const user = await UserModel.findOne({username});
     if (!user) {
-      throw 'User not found';
+      throw httpError.badRequest('User not found');
     }
 
     const passwordIsValid = bcrypt.compareSync(
@@ -24,7 +24,7 @@ class UserService {
       user.password
     );
     if (!passwordIsValid) {
-      throw 'Invalid username or password';
+      throw httpError.badRequest("Invalid username or password");
     }
 
     const token = jwt.sign({id: user._id}, process.env.JWT_SECRET ,{

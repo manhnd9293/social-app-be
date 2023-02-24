@@ -4,29 +4,21 @@ const {HttpError} = require("../../utils/HttpError");
 const http = require("http");
 const router = require('express').Router();
 
-router.post('/sign-in', async (req, res) => {
+router.post('/sign-in', async (req, res, next) => {
   const {username, password} = req.body;
   UserService.login(username, password).then(data => {
     res.send({data})
   }).catch(e => {
-    console.log({e})
-    res.send({
-      status: 403,
-      message: e.message
-    });
+    next(e);
   })
 });
 
-router.post('/sign-up', async (req, res) => {
+router.post('/sign-up', async (req, res, next) => {
   const {username, password, fullName} = req.body;
   UserService.signUp(username, password, fullName).then((data) => {
     res.send({data})
   }).catch(e => {
-    console.log(e)
-    res.send({
-      status: 403,
-      message: e.message,
-    })
+    next(e);
   })
 })
 
@@ -35,7 +27,6 @@ router.get('/me',verifyToken ,async (req, res) => {
   UserService.getUser(userId).then(data => {
     res.send({data});
   })
-
 })
 
 router.get('/check-username-exist', async (req,res) => {
@@ -50,7 +41,6 @@ router.get('/check-username-exist', async (req,res) => {
 })
 
 router.get('/test', async (req, res, next) => {
-  // throw 'Invalid request';
   UserService.testError().then(()=>{
     res.json({
       data: 'success'
