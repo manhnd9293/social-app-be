@@ -1,7 +1,6 @@
 const multer = require('multer');
 
 function avatarFileFilter (req, file, cb) {
-  console.log(file);
   const mimetype = file.mimetype;
   if(!['image/jpeg', 'image/png', 'image/gif',].includes(mimetype)){
     cb(null, false);
