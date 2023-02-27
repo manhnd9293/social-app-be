@@ -3,8 +3,6 @@ const {UserController} = require("../services/user/UserController");
 const {companyController} = require("../services/company/CompanyController");
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('../swagger_output.json');
-const {jwtAuth} = require("../middlewares");
-const {verifyToken} = require("../middlewares/jwtAuth");
 
 const router = require('express').Router();
 
