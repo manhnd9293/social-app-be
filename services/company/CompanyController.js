@@ -4,6 +4,7 @@ const {AwsS3} = require("../../config/aws/s3/s3Config");
 const router = require('express').Router();
 
 router.post('/', async (req, res, next) => {
+  // #swagger.tags = ['Company']
   const data = req.body;
 
   companyService.create(data).then(data => {
@@ -18,6 +19,8 @@ router.post('/', async (req, res, next) => {
 
 
 router.get('/check-name-exist', async (req,res, next) => {
+  // #swagger.tags = ['Company']
+
   const {name} = req.query;
   companyService.checkNameExist(name).then(data => {
     res.json({
@@ -30,6 +33,8 @@ router.get('/check-name-exist', async (req,res, next) => {
 })
 
 router.get('/:id', async (req, res, next) => {
+  // #swagger.tags = ['Company']
+
   const {id} = req.params;
   companyService.getCompany(id).then(data => {
     res.json({data})
@@ -40,6 +45,8 @@ router.get('/:id', async (req, res, next) => {
 
 
 router.patch('/:id/logo',uploadAvatar.single('file'), async (req, res, next) => {
+  // #swagger.tags = ['Company']
+
   const {file : {path: filepath}} = req;
   const {id} = req.params;
   companyService.uploadLogo(id,filepath).then(location => {
