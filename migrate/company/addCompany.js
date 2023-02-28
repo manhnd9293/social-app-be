@@ -74,10 +74,16 @@ async function addCompany() {
     }
   })
 
-  console.log({datas})
   for(let d of datas) {
     await CompanyModel.create(d);
   }
+  console.log('Done add data');
 }
 
-addCompany();
+addCompany().then(() => {
+  console.log('migrate data successfully');
+  process.exit()
+}).catch(e => {
+  console.log('Fail to migrate data');
+  process.exit();
+});

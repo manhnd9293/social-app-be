@@ -2,6 +2,7 @@ const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const { httpError} = require("../../utils/HttpError");
+const {AccountState} = require("../../utils/Constant");
 
 
 class UserService {
@@ -17,6 +18,10 @@ class UserService {
     const user = await UserModel.findOne({username});
     if (!user) {
       throw httpError.badRequest('User not found');
+    }
+
+    if (user.state !== AccountState.Active) {
+      throw httpError.badRequest('Your account is temporary pending. Please wait for approval from our admin');
     }
 
     const passwordIsValid = bcrypt.compareSync(
@@ -48,12 +53,14 @@ class UserService {
       username,
       password: bcrypt.hashSync(password, 8),
       fullName,
+      state: AccountState.Pending
     }).save()
 
     return {
       _id: user._id,
-      accessToken: this.generateAccessToken(user._id),
+      accessToken: null,
       fullName,
+      message: 'Your registration is success. Please wait for approval from our admin'
     }
   }
 

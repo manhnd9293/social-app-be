@@ -11,9 +11,12 @@ class HttpError extends Error {
 }
 
 function errorHandler(err, req, res, next) {
+
   console.log(err.stack);
 
   if(err instanceof HttpError) {
+    console.log(`Error message: ${err.messageData.message}`);
+
     //handle user define error
     const {status, message} = err.messageData;
     res.status(Number(status) || 500)
