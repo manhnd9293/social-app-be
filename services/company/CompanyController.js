@@ -31,6 +31,17 @@ router.get('/check-name-exist', async (req,res, next) => {
   })
 
 })
+router.get('/', async (req, res, next) => {
+  // #swagger.tags = ['Company']
+  const {search, province, industry, page} = req.query;
+  try {
+    const responseData = await companyService.getListCompany({search, province, industry, page});
+    res.status(200).json(responseData);
+  } catch (e) {
+    next(e);
+  }
+
+})
 
 router.get('/:id', async (req, res, next) => {
   // #swagger.tags = ['Company']
@@ -59,7 +70,6 @@ router.patch('/:id/logo',uploadAvatar.single('file'), async (req, res, next) => 
   }).catch(e => {
     next(e)
   });
-
 
 })
 

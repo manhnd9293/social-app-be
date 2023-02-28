@@ -72,6 +72,29 @@ class CompanyService {
       throw e;
     });
   }
+
+  async getListCompany({search, page, industry, province}) {
+    const searchCondition = {
+      ... search ? {name: {$regex: new RegExp(utils.escapeRegExp(search), 'i')} } : {},
+      ... industry ? {industry} : {},
+      ... province ? {province} : {}
+    };
+    const companies = await this.companyModel.find(searchCondition, {
+      _id: 1,
+      logo: 1,
+      name: 1,
+      industry: 1,
+      province: 1
+    }).skip(page - 1).limit(10);
+
+    const total = await this.companyModel.count(searchCondition);
+
+    return {
+      companies,
+      total
+    }
+
+  }
 }
 
 module.exports = {companyService: new CompanyService()}
