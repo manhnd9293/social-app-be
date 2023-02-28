@@ -6,22 +6,22 @@ class AwsS3 {
     this.client = new S3Client({region: process.env.AWS_REGION});
   }
 
-  async upload(file) {
+  async upload(filepath, key) {
     const uploadParams = {Bucket: process.env.S3_BUCKET, Key: '', Body: ''};
 
-    let fileStream = fs.createReadStream(file);
+    let fileStream = fs.createReadStream(filepath);
     fileStream.on('error', (err) => {
       console.log('File error', err);
     })
     // uploadParams.Body = fileStream;
 
-    let fileKey = path.basename(file);
+    const fileKey = key || path.basename(filepath);
     uploadParams.Key = fileKey;
     uploadParams.Body = fileStream;
     const command = new PutObjectCommand(uploadParams);
     return this.client.send(command).then(() => {
       return {
-        Location: `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`
+        location: `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`
       }
     })
 

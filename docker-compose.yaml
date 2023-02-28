@@ -8,8 +8,11 @@ services:
   mongo:
     image: mongo
     container_name: test_bulma_db
+    restart: 'always'
     env_file:
       - .env
+    volumes:
+      - test_bulma_data:/data/db
     environment:
       MONGO_INITDB_DATABASE: ${DB_NAME}
       MONGO_INITDB_ROOT_USERNAME: ${DB_USER}

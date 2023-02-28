@@ -1,0 +1,6 @@
+{
+  "ignore": [".idea", ".env", "swagger_output.json"],
+  "events": {
+    "exit": "yarn swagger-autogen"
+  }
+}

@@ -6,4 +6,4 @@ const employeeSchema = new Schema({
 
 const EmployeeModel = model('Employee', employeeSchema);
 
-module.exports = EmployeeModel
+module.exports = EmployeeModel;

@@ -1,7 +1,7 @@
 const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
-const {aws} = require("../../config/aws/aws");
+const { httpError} = require("../../utils/HttpError");
 
 
 class UserService {
@@ -16,7 +16,7 @@ class UserService {
   async login(username, password) {
     const user = await UserModel.findOne({username});
     if (!user) {
-      throw 'User not found';
+      throw httpError.badRequest('User not found');
     }
 
     const passwordIsValid = bcrypt.compareSync(
@@ -24,7 +24,7 @@ class UserService {
       user.password
     );
     if (!passwordIsValid) {
-      throw 'Invalid username or password';
+      throw httpError.badRequest("Invalid username or password");
     }
 
     const token = jwt.sign({id: user._id}, process.env.JWT_SECRET ,{
@@ -69,6 +69,11 @@ class UserService {
     const user = await UserModel.findOne({username}).lean();
 
     return !!user;
+  }
+
+  async testError() {
+    await UserModel.findOne({});
+    throw httpError.badRequest('User existed');
   }
 }
 
