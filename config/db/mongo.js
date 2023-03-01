@@ -4,7 +4,7 @@ mongoose.set('strictQuery', true);
 async function connectDb() {
   try{
     let uri = '';
-    if(process.env.NODE_ENV = 'production'){
+    if(process.env.NODE_ENV === 'production'){
       uri = process.env.DB_CONNECTION_STRING
     } else {
       uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?authSource=admin`;

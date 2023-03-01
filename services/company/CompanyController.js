@@ -70,7 +70,5 @@ router.patch('/:id/logo',uploadAvatar.single('file'), async (req, res, next) => 
   }).catch(e => {
     next(e)
   });
-
 })
-
 module.exports = {companyController: router}
