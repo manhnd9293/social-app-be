@@ -85,7 +85,7 @@ class CompanyService {
       name: 1,
       industry: 1,
       province: 1
-    }).skip(page - 1).limit(10);
+    }).skip((page - 1) * 10).limit(10);
 
     const total = await this.companyModel.count(searchCondition);
 

@@ -8,7 +8,9 @@ const router = require('express').Router();
 
 router.use('/employee', EmployeeController)
 router.use('/user', UserController)
-router.use('/company', companyController)
-router.use( '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+router.use('/company', companyController);
+if(process.env.NODE_ENV !== 'production') {
+  router.use( '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+}
 
 module.exports = {rootRouter: router}
