@@ -12,5 +12,6 @@ router.use('/company', companyController);
 if(process.env.NODE_ENV !== 'production') {
   router.use( '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 }
+router.use( '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 module.exports = {rootRouter: router}

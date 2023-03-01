@@ -1,4 +1,4 @@
-const {S3Client, PutObjectCommand, GetObjectAttributesCommand} = require('@aws-sdk/client-s3');
+const {S3Client, PutObjectCommand, GetObjectAttributesCommand, DeleteObjectCommand} = require('@aws-sdk/client-s3');
 const fs = require("fs");
 const path = require("path");
 class AwsS3 {
@@ -35,6 +35,19 @@ class AwsS3 {
 
     const command = new GetObjectAttributesCommand(params);
     return this.client.send(command);
+  }
+
+  async deleleObject(key) {
+    const bucketParams = {
+      Bucket: process.env.S3_BUCKET,
+      Key: key
+    }
+    try {
+      const data = await this.client.send(new DeleteObjectCommand(bucketParams));
+      return data;
+    } catch (e) {
+      console.log("Error", e)
+    }
   }
 
 }
