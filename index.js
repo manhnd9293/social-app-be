@@ -9,7 +9,7 @@ const {errorHandler} = require("./utils/HttpError");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({origin: JSON.parse(process.env.UI_DOMAINS)}));
 app.use('/', rootRouter);
 app.use(errorHandler);
 
