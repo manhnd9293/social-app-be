@@ -1,7 +1,5 @@
 const {UserService} = require("./UserService");
 const {verifyToken} = require("../../middlewares/jwtAuth");
-const {HttpError} = require("../../utils/HttpError");
-const http = require("http");
 const router = require('express').Router();
 
 router.post('/sign-in', async (req, res, next) => {
@@ -28,8 +26,8 @@ router.post('/sign-up', async (req, res, next) => {
 router.get('/me',verifyToken ,async (req, res) => {
   // #swagger.tags = ['User']
 
-  const userId = req;
-  UserService.getUser(userId).then(data => {
+  const {userId} = req;
+  UserService.getUser(userId, {avatar: 1}).then(data => {
     res.send({data});
   })
 })
@@ -58,6 +56,20 @@ router.get('/test', async (req, res, next) => {
     next(e);
   });
 
+})
+
+router.get('/:id/profile', verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  const {id} = req.params;
+  try {
+    const user = await UserService.getUser(id, {avatar: 1})
+    res.status(200).json({
+      data: user
+    })
+  } catch (e) {
+    next(e);
+  }
 })
 
 module.exports = {UserController: router}

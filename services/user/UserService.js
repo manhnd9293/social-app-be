@@ -6,11 +6,12 @@ const {AccountState} = require("../../utils/Constant");
 
 
 class UserService {
-  async getUser(id) {
-    const user = await UserModel.findOne({id}, {
-      username: 1,
-      fullName: 1,
-    }).lean();
+  async getUser(id, populate) {
+    const defaultPopulate = {username: 1, fullName: 1}
+    const user = await UserModel.findOne(
+      {_id: id},
+      {... defaultPopulate, ...populate})
+      .lean();
 
     return user;
   }
