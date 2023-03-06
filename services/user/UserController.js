@@ -71,5 +71,19 @@ router.get('/:id/profile', verifyToken, async (req, res, next) => {
     next(e);
   }
 })
+router.get('/invitations', verifyToken, async (req,res, next) => {
+  // #swagger.tags = ['User']
 
+  try {
+    const {userId} = req;
+    const invites = await UserService.getInvitations(userId);
+    res.json({
+      data: invites
+    })
+  } catch (e) {
+    next(e)
+  }
+
+
+})
 module.exports = {UserController: router}

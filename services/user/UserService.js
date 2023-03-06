@@ -2,7 +2,8 @@ const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const { httpError} = require("../../utils/HttpError");
-const {AccountState} = require("../../utils/Constant");
+const {AccountState, RequestState} = require("../../utils/Constant");
+const RequestModel = require("../request/RequestModel");
 
 
 class UserService {
@@ -83,6 +84,20 @@ class UserService {
   async testError() {
     await UserModel.findOne({});
     throw httpError.badRequest('User existed');
+  }
+
+  async getInvitations(userId) {
+    const check = await UserModel.findOne({_id: userId});
+    if (!check) {
+      throw 'User not found'
+    }
+
+    let invites = await RequestModel.find({
+      to: userId,
+      state: RequestState.Pending
+    }).populate({path: 'from', select: {avatar: 1, fullName: 1}});
+
+    return invites;
   }
 }
 
