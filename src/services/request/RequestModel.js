@@ -1,5 +1,5 @@
 const {Schema, model} = require("mongoose");
-const {RequestState} = require("../../utils/constant");
+const {RequestState} = require("../../utils/Constant");
 
 const requestSchema = new Schema({
   from: {type: Schema.Types.ObjectId, ref: 'User' },

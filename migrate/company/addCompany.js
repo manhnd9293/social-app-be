@@ -1,5 +1,5 @@
-const CompanyModel = require("../../services/company/CompanyModel");
-const {connectDb} = require("../../config/db/mongo");
+const CompanyModel = require("../../src/services/company/CompanyModel");
+const {connectDb} = require("../../src/config/db/mongo");
 require('dotenv').config();
 
 async function addCompany() {
