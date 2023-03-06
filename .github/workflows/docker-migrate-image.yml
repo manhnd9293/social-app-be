@@ -1,7 +1,7 @@
-name: Build Docker Image CI
+name: Build Docker Migrate Image CI
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "migrate" ]
 
 jobs:
 
@@ -11,13 +11,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build -t bulma-be .
+    - name: Build the Docker Migrate image
+      run: docker build -t migrate-be .
     - name:  Tag image
-      run: docker tag bulma-be manhndtest/bulma-be
+      run: docker tag migrate-be manhndtest/huni-migrate-be
     - name: Login docker
       env:
         PASSWORD: ${{secrets.DOCKER_PWD}}
       run: docker login -u manhndtest -p "$PASSWORD"
     - name: Push to dockerhub
-      run: docker push manhndtest/bulma-be
+      run: docker push manhndtest/huni-migrate-be
