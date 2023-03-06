@@ -41,6 +41,7 @@ class UserService {
       _id: user._id,
       accessToken: token,
       fullName: user.fullName,
+      avatar: user.avatar
     }
   }
 
