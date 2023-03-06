@@ -99,6 +99,20 @@ class UserService {
 
     return invites;
   }
+
+  async getSentRequests(userId) {
+    const check = await UserModel.findOne({_id: userId});
+    if (!check) {
+      throw 'User not found'
+    }
+
+    let sentRequests = await RequestModel.find({
+      from: userId,
+      state: RequestState.Pending
+    }).populate({path: 'to', select: {avatar: 1, fullName: 1}});
+
+    return sentRequests;
+  }
 }
 
 module.exports = {UserService: new UserService()}

@@ -73,7 +73,6 @@ router.get('/:id/profile', verifyToken, async (req, res, next) => {
 })
 router.get('/invitations', verifyToken, async (req,res, next) => {
   // #swagger.tags = ['User']
-
   try {
     const {userId} = req;
     const invites = await UserService.getInvitations(userId);
@@ -83,7 +82,18 @@ router.get('/invitations', verifyToken, async (req,res, next) => {
   } catch (e) {
     next(e)
   }
+})
 
-
+router.get('/sent-requests', verifyToken, async (req,res, next) => {
+  // #swagger.tags = ['User']
+  try {
+    const {userId} = req;
+    const sentRequests = await UserService.getSentRequests(userId);
+    res.json({
+      data: sentRequests
+    })
+  } catch (e) {
+    next(e)
+  }
 })
 module.exports = {UserController: router}
