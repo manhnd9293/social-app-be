@@ -9,11 +9,11 @@ const MessageModel = require("../message/MessageModel");
 
 
 class UserService {
-  async getUser(id, populate) {
+  async getUser(id, fields) {
     const defaultPopulate = {username: 1, fullName: 1}
     const user = await UserModel.findOne(
       {_id: id},
-      {... defaultPopulate, ...populate})
+      {... defaultPopulate, ...fields})
       .lean();
 
     return user;
@@ -58,7 +58,7 @@ class UserService {
       username,
       password: bcrypt.hashSync(password, 8),
       fullName,
-      state: AccountState.Pending
+      state: process.env.NODE_ENV === 'production' ? AccountState.Pending: AccountState.Active
     }).save()
 
     return {

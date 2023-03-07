@@ -62,8 +62,15 @@ router.get('/:id/profile', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
 
   const {id} = req.params;
+  const {userId} = req;
+
   try {
-    const user = await UserService.getUser(id, {avatar: 1})
+    const user = await UserService.getUser(id, {avatar: 1});
+    const currentUser = await UserService.getUser(userId, {friends: 1});
+    const currentUserFriendIds = currentUser.friends.map(friend => friend.friendId.toString());
+    const isFriend = currentUserFriendIds.includes(user._id.toString());
+    user.isFriend = isFriend;
+
     res.status(200).json({
       data: user
     })
