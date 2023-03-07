@@ -8,6 +8,9 @@ class HttpError extends Error {
   badRequest(message) {
     return new HttpError({status: 400, message});
   }
+  unauthorize(message) {
+    return new HttpError({status: 401, message: message || 'You are not allow to do this action'});
+  }
 }
 
 function errorHandler(err, req, res, next) {

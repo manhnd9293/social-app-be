@@ -1,5 +1,5 @@
 const {Schema, model} = require("mongoose");
-const {RequestState} = require("../../utils/Constant");
+const {FriendRequestState} = require("../../utils/Constant");
 
 const requestSchema = new Schema({
   from: {type: Schema.Types.ObjectId, ref: 'User' },
@@ -10,10 +10,10 @@ const requestSchema = new Schema({
   state: {
     type: String,
     enum: {
-      values: Object.values(RequestState),
+      values: Object.values(FriendRequestState),
       message: '${VALUE} is not supported'
     },
-    default: RequestState.Pending,
+    default: FriendRequestState.Pending,
   }
 })
 

@@ -2,8 +2,10 @@ const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const { httpError} = require("../../utils/HttpError");
-const {AccountState, RequestState} = require("../../utils/Constant");
+const {AccountState, FriendRequestState} = require("../../utils/Constant");
 const RequestModel = require("../request/RequestModel");
+const ConversationModel = require("../conversation/ConversationModel");
+const MessageModel = require("../message/MessageModel");
 
 
 class UserService {
@@ -94,7 +96,7 @@ class UserService {
 
     let invites = await RequestModel.find({
       to: userId,
-      state: RequestState.Pending
+      state: FriendRequestState.Pending
     }).populate({path: 'from', select: {avatar: 1, fullName: 1}});
 
     return invites;
@@ -108,11 +110,82 @@ class UserService {
 
     let sentRequests = await RequestModel.find({
       from: userId,
-      state: RequestState.Pending
+      state: FriendRequestState.Pending
     }).populate({path: 'to', select: {avatar: 1, fullName: 1}});
 
     return sentRequests;
   }
-}
 
+  async updateFriendRequest(userId, requestId, state) {
+    const request = await RequestModel.findOne({
+      _id: requestId
+    }).lean();
+
+    if (!request) {
+      throw httpError.badRequest('Request not exist');
+    }
+
+    const fromUser = await UserModel.findOne({_id: request.from}).lean();
+    if (!fromUser) {
+      throw httpError.badRequest('User not existed');
+    }
+
+    if (userId !== request.to) {
+      throw httpError.unauthorize('You are not allowed to accept this request');
+    }
+
+    if (request.state !== FriendRequestState.Pending) {
+      throw httpError.badRequest('Request ')
+    }
+    if (![FriendRequestState.Accepted, FriendRequestState.Decline].includes(state)) {
+      throw httpError.badRequest('Invalid update state');
+    }
+
+    await RequestModel.updateOne({
+      _id: requestId
+    },{
+      $set: {
+        state
+      }
+    })
+
+    if (state === FriendRequestState.Decline) {
+      return 'update success';
+    }
+
+    const conversation = await ConversationModel.create({
+      participants: [request.from, userId]
+    });
+
+    let conversationId = conversation._id;
+    if (request.message) {
+      const message = await MessageModel.create({
+        conversationId,
+        from: request.from,
+        date: request.date,
+        textContent: request.message
+      })
+      await ConversationModel.updateOne({
+        _id: conversationId
+      }, {
+        $set: {
+          lastMessageId: message._id
+        }
+      });
+    }
+
+    await UserModel.updateOne({
+      _id: {$in: [userId, request.from]}
+    }, {
+      $push: {
+        friends: {
+          friendId: "$_id" === userId ? request.from : userId,
+          conversationId
+        }
+      }
+    })
+
+
+  }
+}
 module.exports = {UserService: new UserService()}

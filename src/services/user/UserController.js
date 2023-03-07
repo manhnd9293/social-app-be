@@ -96,4 +96,15 @@ router.get('/sent-requests', verifyToken, async (req,res, next) => {
     next(e)
   }
 })
+
+router.get('/friend-request', verifyToken, async(req, res, next) => {
+  // #swagger.tags = ['User']
+  try{
+    const {requestId, state} = req.body;
+    const {userId} = req;
+    await UserService.updateFriendRequest(userId, requestId, state);
+  } catch (e) {
+    next(e);
+  }
+})
 module.exports = {UserController: router}

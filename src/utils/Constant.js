@@ -3,10 +3,11 @@ const AccountState = {
   Active: 'active'
 }
 
-const RequestState = {
+const FriendRequestState = {
   Pending: 'pending',
-  Accepted: 'accepted'
+  Accepted: 'accepted',
+  Decline: 'declined'
 }
 
 
-module.exports = {AccountState, RequestState}
+module.exports = {AccountState, FriendRequestState}
