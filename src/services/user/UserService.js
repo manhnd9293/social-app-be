@@ -130,12 +130,12 @@ class UserService {
       throw httpError.badRequest('User not existed');
     }
 
-    if (userId !== request.to) {
+    if (userId !== request.to.toString()) {
       throw httpError.unauthorize('You are not allowed to accept this request');
     }
 
     if (request.state !== FriendRequestState.Pending) {
-      throw httpError.badRequest('Request ')
+      throw httpError.badRequest('Request error ')
     }
     if (![FriendRequestState.Accepted, FriendRequestState.Decline].includes(state)) {
       throw httpError.badRequest('Invalid update state');
@@ -175,16 +175,39 @@ class UserService {
     }
 
     await UserModel.updateOne({
-      _id: {$in: [userId, request.from]}
+      _id: userId
     }, {
       $push: {
         friends: {
-          friendId: "$_id" === userId ? request.from : userId,
-          conversationId
+          friendId: request.from,
+          conversationId,
+          date: Date.now()
         }
       }
     })
 
+    await UserModel.updateOne({
+      _id: request.from
+    }, {
+      $push: {
+        friends: {
+          friendId: userId,
+          conversationId,
+          date: Date.now()
+        }
+      }
+    })
+  }
+
+  async getFriendList(userId) {
+    return UserModel.findOne({
+      _id: userId
+    }, {
+      friends: {
+        friendId: 1,
+        date: 1,
+      }
+    }).populate({path: 'friends.friendId', select: {avatar: 1, fullName: 1}});
 
   }
 }

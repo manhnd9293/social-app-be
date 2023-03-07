@@ -97,12 +97,30 @@ router.get('/sent-requests', verifyToken, async (req,res, next) => {
   }
 })
 
-router.get('/friend-request', verifyToken, async(req, res, next) => {
+router.patch('/friend-request', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
-  try{
+  try {
     const {requestId, state} = req.body;
     const {userId} = req;
     await UserService.updateFriendRequest(userId, requestId, state);
+    res.status(200).json({
+        message: 'update successfully'
+      }
+    )
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/friends-list', verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {userId} = req;
+    const {friends} = await UserService.getFriendList(userId);
+    res.status(200).json({
+      data: friends
+    })
   } catch (e) {
     next(e);
   }
