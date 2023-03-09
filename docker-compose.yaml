@@ -5,6 +5,17 @@ volumes:
     name: test_bulma_data
 
 services:
+  be:
+    image: be-local
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: local
+      DB_HOST: mongo
+    ports:
+      - '6000:5000'
+    depends_on:
+      - mongo
   mongo:
     image: mongo
     container_name: test_bulma_db

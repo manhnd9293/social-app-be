@@ -1,16 +1,15 @@
 {
   "name": "test-bulma-be",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.js",
-    "production": "node index.js",
+    "dev": "nodemon src/index.js",
+    "production": "node src/index.js",
     "swagger-autogen": "node swagger.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.271.0",
-    "aws-sdk": "^2.1314.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
