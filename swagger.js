@@ -1,7 +1,7 @@
 require('dotenv').config();
 const swaggerAutogen = require('swagger-autogen')();
 const outputFile = './swagger_output.json';
-const endpointsFiles = ['./routes/rootRouter.js'];
+const endpointsFiles = ['./src/routes/rootRouter.js'];
 const doc = {
   info: {
     version: `${process.env.VERSION}`,      // by default: '1.0.0'
