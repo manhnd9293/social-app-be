@@ -1,5 +1,4 @@
 const {EmployeeService} = require("./EmployeeService");
-const { uploadS3 } = require("../../config/aws/aws");
 const {uploadAvatar} = require("../../config/uploadFile");
 const fs = require("fs");
 const {AwsS3} = require("../../config/aws/s3/s3Config");
