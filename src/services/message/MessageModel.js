@@ -5,7 +5,7 @@ const messageSchema = new Schema({
   from: {type: Schema.Types.ObjectId, ref: 'User', require: true},
   textContent: {type: String, maxLength : 200},
   seen: [{type: Schema.Types.ObjectId, ref: 'User', default: []}],
-  date: {type: Date, default: Date.now()}
+  date: {type: Date, default: Date.now}
 })
 
 const MessageModel = model('Message', messageSchema);

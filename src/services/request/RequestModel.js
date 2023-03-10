@@ -6,7 +6,7 @@ const requestSchema = new Schema({
   to: {type: Schema.Types.ObjectId, ref: 'User' },
   message: {type: String, maxLength: 200},
   seen: {type: Boolean, default: false},
-  date: {type: Date, default: Date.now()},
+  date: {type: Date, default: Date.now},
   state: {
     type: String,
     enum: {

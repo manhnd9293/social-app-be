@@ -2,7 +2,7 @@ const {Schema, model} = require('mongoose');
 
 const conversationSchema = new Schema({
     participants: [{type: Schema.Types.ObjectId, require: true, ref: 'User'}],
-    date: {type: Date, default: Date.now()},
+    date: {type: Date, default: Date.now},
     lastMessageId: {type: Schema.Types.ObjectId, ref: 'Message'}
   },
   {
