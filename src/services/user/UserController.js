@@ -147,4 +147,19 @@ router.get('/friends-list', verifyToken, async (req, res, next) => {
     next(e);
   }
 })
+
+router.get('/' , verifyToken, async (req, res, next) =>{
+  // #swagger.tags = ['User']
+  try {
+    const {search} = req.query;
+    const {userId} = req;
+    const users = await UserService.getUsers({search, userId});
+
+    res.json({
+      data: users
+    })
+  } catch (e) {
+    next(e);
+  }
+})
 module.exports = {UserController: router}

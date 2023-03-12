@@ -6,6 +6,7 @@ const {AccountState, FriendRequestState} = require("../../utils/Constant");
 const RequestModel = require("../request/RequestModel");
 const ConversationModel = require("../conversation/ConversationModel");
 const MessageModel = require("../message/MessageModel");
+const {utils} = require("../../utils/utils");
 
 
 class UserService {
@@ -251,7 +252,72 @@ if (!conversation) {
       }
     })
 
+    await RequestModel.updateOne({
+      from: {$in: [userId, unfriendId]},
+      to: {$in: [userId, unfriendId]},
+    },
+    {
+      $set: {
+        state: FriendRequestState.Terminate
+      }
+    })
 
+  }
+
+  async getUsers({search, userId}) {
+    const currentUser = await UserModel.findOne({_id: userId}, {friends: 1}).lean();
+    const friends = currentUser.friends.map(f => f.friendId.toString());
+    const friendsSet = new Set(friends);
+    const sentRequests = await RequestModel.find({
+      from: userId,
+      state: FriendRequestState.Pending
+    }).lean();
+    const receivedRequests = await RequestModel.find({
+      to: userId,
+      state: FriendRequestState.Pending
+    }).lean();
+    const sentRequestSet = new Set(sentRequests.map(r => r.to.toString()));
+    const receiveRequestSet = new Set(receivedRequests.map(r => r.from.toString()));
+
+
+    const escapeRegExp = utils.escapeRegExp(search || '', 'i');
+    const users = await UserModel.find({
+      $or: [
+        {
+          username: {
+            $regex: new RegExp(escapeRegExp),
+          }
+
+        },
+        {
+          fullName: {
+            $regex: new RegExp(escapeRegExp)
+          }
+        },
+      ],
+      state: AccountState.Active,
+      _id: {$ne: userId},
+    }, {
+      username: 1,
+      fullName: 1,
+      avatar: 1
+    }).lean();
+
+    for (let user of users) {
+      const currentUserId = user._id.toString();
+      if (friendsSet.has(currentUserId)) {
+        user.isFriend = true;
+      }
+      if (sentRequestSet.has(currentUserId)) {
+        user.sentRequest = true;
+      }
+
+      if (receiveRequestSet.has(currentUserId)) {
+        user.receiveRequest = true;
+      }
+    }
+
+    return users;
   }
 }
 module.exports = {UserService: new UserService()}

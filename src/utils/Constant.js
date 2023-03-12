@@ -6,7 +6,8 @@ const AccountState = {
 const FriendRequestState = {
   Pending: 'pending',
   Accepted: 'accepted',
-  Decline: 'declined'
+  Decline: 'declined',
+  Terminate: 'terminate'
 }
 
 
