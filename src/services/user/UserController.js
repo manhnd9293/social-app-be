@@ -119,6 +119,21 @@ router.patch('/friend-request', verifyToken, async (req, res, next) => {
   }
 });
 
+router.patch('/unfriend', verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {userId} = req;
+    const {unfriendId} = req.body;
+    await UserService.unfriend(userId, unfriendId);
+    res.status(200).json({
+      message: 'unfriend success'
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
 router.get('/friends-list', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
 

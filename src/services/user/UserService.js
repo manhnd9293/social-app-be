@@ -146,16 +146,24 @@ class UserService {
     },{
       $set: {
         state
-      }
-    })
-
-    if (state === FriendRequestState.Decline) {
-      return 'update success';
     }
+  })
 
-    const conversation = await ConversationModel.create({
-      participants: [request.from, userId]
-    });
+  if (state === FriendRequestState.Decline) {
+  return 'update success';
+}
+let conversation = await ConversationModel.findOne({
+  participants: {
+    $size: 2,
+    $all: [request.from, userId]
+  }}).lean();
+
+if (!conversation) {
+  conversation = await ConversationModel.create({
+        participants: [request.from, userId]
+      });
+
+    }
 
     let conversationId = conversation._id;
     if (request.message) {
@@ -208,6 +216,41 @@ class UserService {
         date: 1,
       }
     }).populate({path: 'friends.friendId', select: {avatar: 1, fullName: 1}});
+
+  }
+
+  async unfriend(userId, unfriendId) {
+    if (!unfriendId) {
+      throw httpError.badRequest("No user to unfriend");
+    }
+    let {friends} = await UserModel.findOne({
+      _id: userId
+    }, {friends: 1}).lean();
+
+    if (!friends.map(friend => friend.friendId.toString()).includes(unfriendId)) {
+      throw httpError.badRequest('Unfriend user not in friend list of current user');
+    }
+
+    await UserModel.updateOne({
+      _id: userId
+    }, {
+      $pull: {
+        friends: {
+          friendId: unfriendId
+        }
+      }
+    });
+
+    await UserModel.updateOne({
+      _id: unfriendId
+    }, {
+      $pull: {
+        friends: {
+          friendId: userId
+        }
+      }
+    })
+
 
   }
 }
