@@ -255,6 +255,7 @@ if (!conversation) {
     await RequestModel.updateOne({
       from: {$in: [userId, unfriendId]},
       to: {$in: [userId, unfriendId]},
+      state: FriendRequestState.Accepted
     },
     {
       $set: {
