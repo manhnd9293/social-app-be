@@ -25,37 +25,6 @@
     "application/json"
   ],
   "paths": {
-    "/employee/": {
-      "get": {
-        "description": "",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "post": {
-        "description": "",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/employee/upload": {
-      "patch": {
-        "description": "",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/user/sign-in": {
       "post": {
         "tags": [
@@ -511,7 +480,7 @@
     "/conversations/": {
       "get": {
         "tags": [
-          "User"
+          "Conversation"
         ],
         "description": "",
         "parameters": [
@@ -536,6 +505,9 @@
     },
     "/conversations/{id}": {
       "get": {
+        "tags": [
+          "Conversation"
+        ],
         "description": "",
         "parameters": [
           {
@@ -565,6 +537,9 @@
     },
     "/conversations/{id}/messages": {
       "get": {
+        "tags": [
+          "Conversation"
+        ],
         "description": "",
         "parameters": [
           {
