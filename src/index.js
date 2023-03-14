@@ -2,7 +2,7 @@ const express = require("express");
 require('dotenv').config();
 const {connectDb} = require("./config/db/mongo");
 require('./config/uploadFile')
-const { configRoute } = require("./routes/rootRouter");
+const { configRoute } = require("./config/routes");
 const cors = require('cors');
 const {errorHandler} = require("./utils/HttpError");
 
