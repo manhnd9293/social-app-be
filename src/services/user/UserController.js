@@ -45,19 +45,6 @@ router.get('/check-username-exist', async (req,res) => {
   })
 })
 
-router.get('/test', async (req, res, next) => {
-  // #swagger.tags = ['User']
-
-  UserService.testError().then(()=>{
-    res.json({
-      data: 'success'
-    })
-  }).catch(e =>{
-    next(e);
-  });
-
-})
-
 router.get('/:id/profile', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
 
@@ -78,6 +65,7 @@ router.get('/:id/profile', verifyToken, async (req, res, next) => {
     next(e);
   }
 })
+
 router.get('/invitations', verifyToken, async (req,res, next) => {
   // #swagger.tags = ['User']
   try {
@@ -91,7 +79,7 @@ router.get('/invitations', verifyToken, async (req,res, next) => {
   }
 })
 
-router.get('/sent-requests', verifyToken, async (req,res, next) => {
+router.get('/sent-requests', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
   try {
     const {userId} = req;
@@ -102,22 +90,9 @@ router.get('/sent-requests', verifyToken, async (req,res, next) => {
   } catch (e) {
     next(e)
   }
-})
-
-router.patch('/friend-request', verifyToken, async (req, res, next) => {
-  // #swagger.tags = ['User']
-  try {
-    const {requestId, state} = req.body;
-    const {userId} = req;
-    await UserService.updateFriendRequest(userId, requestId, state);
-    res.status(200).json({
-        message: 'update successfully'
-      }
-    )
-  } catch (e) {
-    next(e);
-  }
 });
+
+
 
 router.patch('/unfriend', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
