@@ -10,5 +10,32 @@ const FriendRequestState = {
   Terminate: 'terminate'
 }
 
+const Industry = {
+  IT: 'it',
+  Mining: 'mining',
+  Accommodation: 'accommodation',
+  Education: 'education',
+  HealthService: 'health-service',
+  Finance: 'finance',
+  FoodManufacturing: 'food-manufacturing',
+  Furniture: 'furniture',
+  Gasoline:'gasoline',
+  Hospitals: 'hospitals',
+  Leather: 'leather',
+  MotorVehicle: 'motor-vehicle',
+  NaturalResource:'natural-resource',
+  Telecommunication:'telecommunication',
+  Wholesale: 'wholesale',
+  WaterTransportation: 'water-transportation'
+}
 
-module.exports = {AccountState, FriendRequestState}
+const Province = {
+  Hanoi: 'hanoi',
+  HochiminhCity: 'hochiminh-city',
+  Danang: 'danang',
+  Hue: 'hue',
+  NamDinh: 'nam-dinh',
+  HaiPhong: 'hai-phong',
+  Other: 'others'
+}
+module.exports = {AccountState, FriendRequestState, Industry, Province}

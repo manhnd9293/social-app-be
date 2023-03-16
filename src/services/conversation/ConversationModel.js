@@ -10,12 +10,6 @@ const conversationSchema = new Schema({
     toObject: {virtuals: true},
   })
 
-// conversationSchema.virtual('lastMessage', {
-//   ref: 'Message',
-//   localField: 'lastMessageId',
-//   foreignField: '_id',
-//   justOne: true
-// })
 
 const ConversationModel = model('Conversation', conversationSchema);
 

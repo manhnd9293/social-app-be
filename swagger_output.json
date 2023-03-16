@@ -324,6 +324,34 @@
         }
       }
     },
+    "/company/industries": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/company/provinces": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/company/": {
       "post": {
         "tags": [

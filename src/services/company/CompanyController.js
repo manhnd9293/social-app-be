@@ -1,7 +1,51 @@
 const {companyService} = require("./CompanyService");
 const {uploadAvatar} = require("../../config/uploadFile");
 const {AwsS3} = require("../../config/aws/s3/s3Config");
+const {Industry, Province} = require("../../utils/Constant");
+const {utils} = require("../../utils/utils");
 const router = require('express').Router();
+
+router.get('/industries', async (req,res, next) => {
+  // #swagger.tags = ['Company']
+
+  try {
+    const data = Object.values(Industry).reduce((list, item) => {
+      list.push(
+        {
+          id: item,
+          value: item,
+          label: utils.upperCaseFirst(item.split('-').join(' '))
+        }
+      )
+      return list;
+    }, []);
+    res.json({
+      data
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get('/provinces', async (req,res, next) => {
+    // #swagger.tags = ['Company']
+
+    try {
+      const data = Object.values(Province).reduce((list, item) => {
+          list.push({
+            id: item,
+            value: item,
+            label: item.split('-').map(w => utils.upperCaseFirst(w)).join(' ')
+          })
+        return list;
+      }, []);
+      res.json({data});
+
+    } catch (e) {
+      next(e)
+    }
+})
+
 
 router.post('/', async (req, res, next) => {
   // #swagger.tags = ['Company']
@@ -55,12 +99,12 @@ router.get('/:id', async (req, res, next) => {
 })
 
 
-router.patch('/:id/logo',uploadAvatar.single('file'), async (req, res, next) => {
+router.patch('/:id/logo', uploadAvatar.single('file'), async (req, res, next) => {
   // #swagger.tags = ['Company']
 
-  const {file : {path: filepath}} = req;
+  const {file: {path: filepath}} = req;
   const {id} = req.params;
-  companyService.uploadLogo(id,filepath).then(location => {
+  companyService.uploadLogo(id, filepath).then(location => {
     res.json(
       {
         data: {
@@ -70,5 +114,8 @@ router.patch('/:id/logo',uploadAvatar.single('file'), async (req, res, next) => 
   }).catch(e => {
     next(e)
   });
-})
+});
+
+
+
 module.exports = {companyController: router}
