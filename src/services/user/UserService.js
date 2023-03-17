@@ -7,6 +7,8 @@ const RequestModel = require("../request/RequestModel");
 const ConversationModel = require("../conversation/ConversationModel");
 const MessageModel = require("../message/MessageModel");
 const {utils} = require("../../utils/utils");
+const fs = require("fs");
+const {AwsS3} = require("../../config/aws/s3/s3Config");
 
 
 class UserService {
@@ -228,6 +230,31 @@ class UserService {
     }
 
     return users;
+  }
+
+  async updateAvatar(userId, file) {
+    const filepath = file.path;
+    const user = await UserModel.findOne({_id: userId}).lean();
+    const key = `user/${user.username}/avatar/${file.filename}`;
+    const data = await AwsS3.upload(filepath, key).then(async (res) => {
+      const {location} = res;
+      await UserModel.updateOne(({_id: userId}),
+        {
+          $set: {
+            avatar: location
+          }
+        })
+
+      return {avatar: location}
+    });
+    fs.unlink(filepath, (err) => {
+      if (err) {
+        console.log(`Fail to upload`)
+      }
+      console.log('delete temp file success');
+    });
+
+    return data;
   }
 }
 module.exports = {UserService: new UserService()}

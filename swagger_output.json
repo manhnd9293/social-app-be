@@ -324,6 +324,20 @@
         }
       }
     },
+    "/user/avatar": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/company/industries": {
       "get": {
         "tags": [

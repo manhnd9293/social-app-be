@@ -1,5 +1,6 @@
 const {UserService} = require("./UserService");
 const {verifyToken} = require("../../middlewares/jwtAuth");
+const {uploadAvatar} = require("../../config/uploadFile");
 const router = require('express').Router();
 
 router.post('/sign-in', async (req, res, next) => {
@@ -123,7 +124,7 @@ router.get('/friends-list', verifyToken, async (req, res, next) => {
   }
 })
 
-router.get('/' , verifyToken, async (req, res, next) =>{
+router.get('/', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
   try {
     const {search} = req.query;
@@ -136,5 +137,19 @@ router.get('/' , verifyToken, async (req, res, next) =>{
   } catch (e) {
     next(e);
   }
+});
+
+router.patch('/avatar', verifyToken, uploadAvatar.single('file') ,async (req,res, next) => {
+    // #swagger.tags = ['User']
+
+    try {
+      const {file} = req;
+      const {userId} = req;
+      const data = await UserService.updateAvatar(userId, file);
+
+      res.status(200).json({data});
+    } catch (e) {
+      next(e)
+    }
 })
 module.exports = {UserController: router}
