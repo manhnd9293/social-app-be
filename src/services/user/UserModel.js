@@ -1,5 +1,5 @@
 const {Schema, model} = require('mongoose');
-const {AccountState} = require("../../utils/Constant");
+const {AccountState, OnlineState} = require("../../utils/Constant");
 
 let friendSchema = new Schema({
     friendId: {type: Schema.Types.ObjectId, ref: 'User'},
@@ -12,6 +12,7 @@ const userSchema = new Schema({
   fullName: {type: String, required: true, maxLength: 50, minLength: 1},
   avatar: {type:String},
   state: {type: String, default: AccountState.Pending},
+  onlineState: {type: String, default: OnlineState.Offline},
   friends: [friendSchema],
 
 })

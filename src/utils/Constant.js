@@ -38,4 +38,10 @@ const Province = {
   HaiPhong: 'hai-phong',
   Other: 'others'
 }
-module.exports = {AccountState, FriendRequestState, Industry, Province}
+
+const OnlineState = {
+  Online: 'online',
+  Offline: 'offline'
+}
+
+module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState}

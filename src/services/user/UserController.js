@@ -152,4 +152,14 @@ router.patch('/avatar', verifyToken, uploadAvatar.single('file') ,async (req,res
       next(e)
     }
 })
+
+router.get('/test', async (req,res, next) => {
+    // #swagger.tags = ['']
+
+    try {
+      res.status(200).json({data: 1});
+    } catch (e) {
+      next(e)
+    }
+})
 module.exports = {UserController: router}

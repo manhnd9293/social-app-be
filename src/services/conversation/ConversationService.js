@@ -16,7 +16,7 @@ class ConversationService {
       }
     ).populate(
       [
-        {path: 'friends.friendId', select: {fullName: 1, avatar: 1}},
+        {path: 'friends.friendId', select: {fullName: 1, avatar: 1, onlineState: 1}},
         {
           path: 'friends.conversationId',
           select: {
@@ -69,7 +69,8 @@ class ConversationService {
         path: 'participants',
         select: {
           fullName: 1,
-          avatar: 1
+          avatar: 1,
+          onlineState: 1
         }
       }
     ).lean();

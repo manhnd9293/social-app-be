@@ -8,10 +8,10 @@ const {RequestController} = require("../../services/request/RequestController");
 
 
 function configRoute(app) {
-  app.use((req, res, next) => {
-    console.log(`${DateTime.now()}: ${req.method} - url: ${req.originalUrl}`)
-    next();
-  })
+  // app.use((req, res, next) => {
+  //   console.log(`${DateTime.now()}: ${req.method} - url: ${req.originalUrl}`)
+  //   next();
+  // })
 
   app.use('/user', UserController)
   app.use('/company', companyController);
