@@ -61,14 +61,14 @@ class RequestService {
       throw httpError.badRequest('User not existed');
     }
 
-    if (userId !== request.to.toString()) {
+    if (userId !== request.to.toString() && state === FriendRequestState.Accepted) {
       throw httpError.unauthorize('You are not allowed to accept this request');
     }
 
     if (request.state !== FriendRequestState.Pending) {
       throw httpError.badRequest('Request error ')
     }
-    if (![FriendRequestState.Accepted, FriendRequestState.Decline].includes(state)) {
+    if (![FriendRequestState.Accepted, FriendRequestState.Decline, FriendRequestState.Cancel].includes(state)) {
       throw httpError.badRequest('Invalid update state');
     }
 
@@ -80,7 +80,7 @@ class RequestService {
       }
     })
 
-    if (state === FriendRequestState.Decline) {
+    if (state === FriendRequestState.Decline || state === FriendRequestState.Cancel) {
       return;
     }
     let conversation = await ConversationModel.findOne({

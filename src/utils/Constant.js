@@ -7,7 +7,8 @@ const FriendRequestState = {
   Pending: 'pending',
   Accepted: 'accepted',
   Decline: 'declined',
-  Terminate: 'terminate'
+  Terminate: 'terminate',
+  Cancel: 'canceled'
 }
 
 const Industry = {
