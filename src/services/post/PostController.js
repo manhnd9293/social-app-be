@@ -44,11 +44,18 @@ router.patch('/reaction', verifyToken, async (req, res, next) => {
   }
 })
 
-router.patch('/un-react', async (req, res, next) => {
+router.patch('/un-reaction', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['Post']
 
   try {
-    await PostService.unReact(userId, postId);
+    const {userId} = req;
+    const {mediaId, mediaType} = req.body;
+    await PostService.unReact(userId, mediaId, mediaType);
+    res.status(200).json({
+      data: {
+        message: 'update success'
+      }
+    })
   } catch (e) {
     next(e)
   }

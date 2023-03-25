@@ -64,8 +64,23 @@ class PostService {
     }
 
     const check = await ReactionModel.findOne({mediaType: media, mediaId: mediaId, userId}).lean();
-    if (!!check) {
+    if (check && check.type === react) {
       throw httpError.badRequest('User reacted before');
+    }
+    if (check && check.type !== react) {
+      await ReactionModel.deleteOne({mediaType: media, mediaId, userId});
+      await mediaModel.updateOne({
+        _id: mediaId,
+        totalReaction: {
+          $elemMatch: {
+            type: check.type
+          }
+        }
+      }, {
+        $inc: {
+          'totalReaction.$.value': -1
+        }
+      })
     }
     await ReactionModel.create({mediaType: media, mediaId: mediaId, userId, type: react});
 
@@ -97,6 +112,29 @@ class PostService {
     }
   }
 
+  async unReact(userId, mediaId, mediaType) {
+    const reaction = await ReactionModel.findOne({userId, mediaId, mediaType});
+    if(!reaction) {
+      throw httpError.badRequest('Reaction not found');
+    }
+    await ReactionModel.deleteOne({userId, mediaId, mediaType});
+    const mediaModel = this.getModelFromMedia(mediaType);
+
+    await mediaModel.updateOne({
+      _id: mediaId,
+      totalReaction: {
+        $elemMatch: {
+          type: reaction.type
+        }
+      }
+    }, {
+      $inc: {
+        'totalReaction.$.value': -1
+      }
+    });
+  }
+
+
   getModelFromMedia(media) {
     switch (media) {
       case Media.Post:
@@ -110,9 +148,6 @@ class PostService {
     }
   }
 
-  async unReact(userId, postId) {
-
-  }
 }
 
 module.exports = {PostService: new PostService()}
