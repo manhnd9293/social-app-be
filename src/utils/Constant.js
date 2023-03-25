@@ -45,4 +45,20 @@ const OnlineState = {
   Offline: 'offline'
 }
 
-module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState}
+const Reaction = {
+  Like: 'like',
+  Love: 'love',
+  Angry: 'angry',
+  Haha: 'haha',
+  Sad: 'sad',
+  Wow: 'wow',
+  Care: 'care'
+}
+
+const Media = {
+  Post: 'post',
+  Photo: 'photo',
+  Comment: 'comment'
+}
+
+module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media}

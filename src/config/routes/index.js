@@ -5,7 +5,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("../../../swagger_output.json");
 const {DateTime} = require("luxon");
 const {RequestController} = require("../../services/request/RequestController");
-
+const {PostController} = require("../../services/post/PostController");
 
 function configRoute(app) {
   // app.use((req, res, next) => {
@@ -17,6 +17,7 @@ function configRoute(app) {
   app.use('/company', companyController);
   app.use('/conversations', ConversationController);
   app.use('/request', RequestController);
+  app.use('/post', PostController);
 
   if( ['dev', 'int'].includes(process.env.NODE_ENV)) {
     app.get('/test', async (req, res) => {
