@@ -59,5 +59,18 @@ router.patch('/un-reaction', verifyToken, async (req, res, next) => {
   } catch (e) {
     next(e)
   }
+});
+
+router.post('/comment', verifyToken,async (req, res, next) => {
+  // #swagger.tags = ['Post']
+
+  try {
+    const {content, mediaId, mediaType} = req.body;
+    const {userId} = req;
+    await PostService.comment(userId, content, mediaId, mediaType);
+    res.status(201).json({data: {message: 'comment success'}});
+  } catch (e) {
+    next(e)
+  }
 })
 module.exports = {PostController: router};

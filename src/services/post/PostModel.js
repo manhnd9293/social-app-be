@@ -26,7 +26,8 @@ const CommentSchema = new Schema({
   date: {type: Date, default: Date.now},
   mediaType: {type: String}, // of post or photo,
   mediaId: {type: Schema.Types.ObjectId},
-  totalReaction: {type: [totalReactionSchema]}
+  totalReaction: {type: [totalReactionSchema], default: []},
+  isDeleted: {type: Boolean, required: false}
 });
 
 const shareSchema = new Schema({
@@ -39,7 +40,8 @@ const PhotoSchema = new Schema({
   url: {type: String},
   caption: {type: String, maxLength: 20000},
   date: {type: Date, default: Date.now},
-  totalReaction: {type: [totalReactionSchema]}
+  totalReaction: {type: [totalReactionSchema]},
+  isDeleted: {type: Boolean, required: false},
 })
 
 const PostSchema = new Schema({
@@ -48,7 +50,8 @@ const PostSchema = new Schema({
   photos: {type: [{type: Schema.Types.ObjectId, ref: 'Photo'}], default: []},
   date: {type: Date, default: Date.now},
   recentComments: {type: [{type: Schema.Types.ObjectId, ref: 'Comment'}], default: []},
-  totalReaction: {type: [totalReactionSchema]}
+  totalReaction: {type: [totalReactionSchema]},
+  isDeleted: {type: Boolean, required: false}
 });
 
 

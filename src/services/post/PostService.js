@@ -148,6 +148,45 @@ class PostService {
     }
   }
 
+  async comment(commentUserId, content, mediaId, mediaType) {
+    const commentUser = await UserModel.findOne({_id: commentUserId});
+    if (!commentUser) {
+      throw httpError.badRequest('User not exist');
+    }
+
+    if (![Media.Post, Media.Photo].includes(mediaType)) {
+      throw httpError.badRequest('Invalid media type');
+    }
+    const mediaModel = this.getModelFromMedia(mediaType);
+    const post = await mediaModel.findOne({_id: mediaId, isDeleted: {$ne: true}},
+      {
+        userId: 1
+      },
+      {
+        populate: {
+          path: 'userId',
+          select: {
+            friends: 1,
+            _id: 1
+          }
+        }
+      }).lean();
+    if (!post) {
+      throw httpError.badRequest('Post not exist')
+    }
+    const postOwnerFriends = post.userId.friends;
+    if ( post.userId._id.toString() !== commentUserId &&
+      !postOwnerFriends.find(friend => friend.friendId.toString() === commentUserId) ) {
+      throw httpError.badRequest('Only friend of post owner can comment');
+    }
+
+    await CommentModel.create({
+      content,
+      mediaType: mediaType,
+      mediaId: mediaId,
+      userId: commentUserId
+    });
+  }
 }
 
 module.exports = {PostService: new PostService()}
