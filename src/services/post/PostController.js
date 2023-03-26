@@ -37,8 +37,13 @@ router.patch('/reaction', verifyToken, async (req, res, next) => {
   const {userId} = req;
   const {react, id, media} = req.body;
   try {
-    await PostService.updateReact(userId, media, id, react);
-    res.status(200).json({data: {success: true}});
+    const totalReaction = await PostService.updateReact(userId, media, id, react);
+    res.status(200).json({
+      data: {
+        success: true,
+        totalReaction,
+        reaction: react
+    }});
   } catch (e) {
     next(e)
   }
@@ -50,10 +55,12 @@ router.patch('/un-reaction', verifyToken, async (req, res, next) => {
   try {
     const {userId} = req;
     const {mediaId, mediaType} = req.body;
-    await PostService.unReact(userId, mediaId, mediaType);
+    const totalReaction = await PostService.unReact(userId, mediaId, mediaType);
     res.status(200).json({
       data: {
-        message: 'update success'
+        message: 'update success',
+        totalReaction,
+        reaction: null
       }
     })
   } catch (e) {

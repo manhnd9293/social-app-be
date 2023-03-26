@@ -1,6 +1,7 @@
-const {PostModel} = require("../post/PostModel");
+const {PostModel, ReactionModel} = require("../post/PostModel");
 const {httpError} = require("../../utils/HttpError");
 const UserModel = require("../user/UserModel");
+const {Media} = require("../../utils/Constant");
 const {ObjectId} = require('mongoose').Types;
 
 class NewFeedService {
@@ -74,6 +75,21 @@ class NewFeedService {
         }
       }
     ]);
+
+    const postIds = posts.map(post => post._id);
+    const reactions = await ReactionModel.find({mediaId: {$in: postIds}, mediaType: Media.Post, userId}).lean();
+    const postIdToReaction = reactions.reduce((map, reaction) => {
+      const postId = reaction.mediaId.toString();
+      map.set(postId, reaction);
+      return map;
+    }, new Map());
+
+    posts.forEach(post => {
+      const postId = post._id.toString();
+      if (postIdToReaction.has(postId)) {
+        post.reaction = postIdToReaction.get(postId).type;
+      }
+    })
 
     return posts;
   }

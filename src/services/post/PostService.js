@@ -110,6 +110,9 @@ class PostService {
         }
       });
     }
+
+    const {totalReaction} = await mediaModel.findOne({_id: mediaId}, {totalReaction: 1}).lean();
+    return totalReaction;
   }
 
   async unReact(userId, mediaId, mediaType) {
@@ -132,6 +135,9 @@ class PostService {
         'totalReaction.$.value': -1
       }
     });
+
+    const {totalReaction} = await mediaModel.findOne({_id: mediaId}, {totalReaction: 1}).lean();
+    return totalReaction;
   }
 
 
