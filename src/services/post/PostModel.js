@@ -42,12 +42,14 @@ const PhotoSchema = new Schema({
   date: {type: Date, default: Date.now},
   totalReaction: {type: [totalReactionSchema]},
   isDeleted: {type: Boolean, required: false},
+  parentPost: {type: Schema.Types.ObjectId, ref: 'Post', required: true}
 })
 
 const PostSchema = new Schema({
   userId: {type: Schema.Types.ObjectId, ref: 'User'},
   content: {type: String, maxLength: 20000, required: true},
-  photos: {type: [{type: Schema.Types.ObjectId, ref: 'Photo'}], default: []},
+  photoPosts: {type: [{type: Schema.Types.ObjectId, ref: 'PhotoPost'}], default: []},
+  photo: {type: String},
   date: {type: Date, default: Date.now},
   recentComments: {type: [{type: Schema.Types.ObjectId, ref: 'Comment'}], default: []},
   totalReaction: {type: [totalReactionSchema]},

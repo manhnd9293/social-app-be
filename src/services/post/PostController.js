@@ -1,15 +1,17 @@
 const {Router} = require("express");
 const {PostService} = require("./PostService");
 const {verifyToken} = require("../../middlewares/jwtAuth");
+const {uploadPostPhoto} = require("../../config/uploadFile");
 const router = Router();
 
-router.post('/', verifyToken ,async (req, res, next) => {
+router.post('/' , verifyToken, uploadPostPhoto.array('photoFiles') ,async (req, res, next) => {
   // #swagger.tags = ['Post']
 
   try {
     const postData = req.body;
+    const photoFiles = req.files;
     const {userId} = req;
-    const post = await PostService.create(userId,postData);
+    const post = await PostService.create(userId,postData, photoFiles);
     res.status(201).json({data: post, message: 'create post success'});
   } catch (e) {
     next(e)

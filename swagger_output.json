@@ -25,17 +25,6 @@
     "application/json"
   ],
   "paths": {
-    "/test": {
-      "get": {
-        "description": "",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/user/sign-in": {
       "post": {
         "tags": [

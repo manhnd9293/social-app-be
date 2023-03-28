@@ -24,5 +24,5 @@ const avatarLimit = {
   fieldSize: 5,
 }
 const uploadAvatar = multer({dest: 'temp/avatar',limits: avatarLimit,fileFilter: avatarFileFilter})
-
-module.exports = {uploadAvatar}
+const uploadPostPhoto = multer({dest: 'temp/postPhoto'});
+module.exports = {uploadAvatar, uploadPostPhoto}

@@ -7,6 +7,7 @@ const {DateTime} = require("luxon");
 const {RequestController} = require("../../services/request/RequestController");
 const {PostController} = require("../../services/post/PostController");
 const {NewsFeedController} = require("../../services/newFeed/NewFeedController");
+const {TestController} = require("../../services/test/TestController");
 
 function configRoute(app) {
   // app.use((req, res, next) => {
@@ -22,9 +23,8 @@ function configRoute(app) {
   app.use('/news-feed', NewsFeedController);
 
   if( ['dev', 'int'].includes(process.env.NODE_ENV)) {
-    app.get('/test', async (req, res) => {
-      res.json('test');
-    });
+    app.use('/test', TestController)
+
 
     const swaggerFile = require('../../../swagger_output.json');
     const swaggerUi = require('swagger-ui-express');

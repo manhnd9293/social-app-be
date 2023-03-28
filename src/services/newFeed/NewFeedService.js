@@ -63,6 +63,23 @@ class NewFeedService {
         }
       }, //todo: add lookup for photos post url
       {
+        $lookup: {
+          from: 'photoposts',
+          foreignField: '_id',
+          localField: 'photoPosts',
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                url: 1,
+                caption: 1
+              }
+            }
+          ],
+          as: 'photoPostList'
+        }
+      },
+      {
         $project: {
           _id: 1,
           content: 1,
@@ -72,6 +89,8 @@ class NewFeedService {
           'byUser.fullName':1,
           'byUser._id':1,
           'byUser.avatar':1,
+          photo: 1,
+          photoPosts: '$photoPostList',
         }
       }
     ]);

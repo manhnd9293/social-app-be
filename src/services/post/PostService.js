@@ -3,23 +3,89 @@ const {httpError} = require("../../utils/HttpError");
 const {Reaction, Media} = require("../../utils/Constant");
 const UserModel = require("../user/UserModel");
 const {NewFeedModel} = require("../newFeed/NewFeedModel");
+const {AwsS3} = require("../../config/aws/s3/s3Config");
+const fsPromises = require('node:fs/promises')
 const {ObjectId} = require('mongoose').Types;
 
 class PostService {
-  async create(userId, postData) {
+  async create(userId, postData, photoFiles) {
     if (!postData) {
       throw httpError.badRequest('Post data not found');
     }
-    const {content} = postData;
+    const {content, captions} = postData;
 
     if (!content) {
       throw httpError.badRequest('post content not found');
+    }
+
+    if (photoFiles.length > 5) {
+      const unlinkPromises = [];
+      photoFiles.forEach(file => {
+        unlinkPromises.push(fsPromises.unlink(file.path));
+      })
+
+      Promise.all(unlinkPromises).then(() => {
+        throw httpError.badRequest('Too many photos, limit photo is 5');
+      })
     }
 
     const post = await PostModel.create({
       userId,
       content,
     });
+
+    const user = await UserModel.findOne({_id: userId});
+    if(photoFiles.length === 1) {
+      const file =  photoFiles[0];
+      const {path} = file;
+      const key = `user/${user.username}/post/${post._id.toString()}/photo/${file.filename}`;
+      const uploadData = await AwsS3.upload(path, key);
+      const {location} = uploadData;
+      await PostModel.updateOne({
+        _id: post._id
+      }, {
+        $set: {
+          photo: location
+        }
+      });
+    } else if(photoFiles.length > 1) {
+      const photoPostIds = [];
+      for (let i=0; i< photoFiles.length; i++) {
+        const file = photoFiles[i];
+        const caption = captions[i];
+        const {path} = file;
+        const photoPost = await PhoToPostModel.create({
+          caption,
+          parentPost: post._id,
+        });
+        const key = `user/${user.username}/post/${post._id.toString()}/photoPost/${photoPost._id.toString()}`;
+        const uploadData = await AwsS3.upload(path, key);
+        await PhoToPostModel.updateOne({
+          _id: photoPost._id
+        }, {
+          $set: {
+            url: uploadData.location
+          }
+        });
+        photoPostIds.push(photoPost._id);
+      }
+      await PostModel.updateOne({
+        _id: post._id
+      }, {
+        $set: {
+          photoPosts: photoPostIds
+        }
+      })
+    }
+
+    const unlinkPromises = [];
+    photoFiles.forEach(file => {
+      unlinkPromises.push(fsPromises.unlink(file.path));
+    })
+
+    Promise.all(unlinkPromises).then(() => {
+      console.log('remove photo post success');
+    })
 
     this.updateFriendsNewFeed(userId, post.toObject());
     return post;
