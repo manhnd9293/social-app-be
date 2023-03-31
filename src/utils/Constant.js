@@ -61,4 +61,10 @@ const Media = {
   Comment: 'comment'
 }
 
-module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media}
+const NotificationType = {
+  Reaction: 'reaction',
+  FriendAccept: 'friend-accept',
+  Comment: 'comment'
+}
+
+module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType}

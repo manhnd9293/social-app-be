@@ -1,10 +1,11 @@
 const {PostModel, ReactionModel, PhoToPostModel, CommentModel} = require("./PostModel");
 const {httpError} = require("../../utils/HttpError");
-const {Reaction, Media} = require("../../utils/Constant");
+const {Reaction, Media, NotificationType} = require("../../utils/Constant");
 const UserModel = require("../user/UserModel");
 const {NewFeedModel} = require("../newFeed/NewFeedModel");
 const {AwsS3} = require("../../config/aws/s3/s3Config");
 const fsPromises = require('node:fs/promises')
+const {NotificationService} = require("../notifications/NotificationService");
 const {ObjectId} = require('mongoose').Types;
 
 class PostService {
@@ -178,6 +179,11 @@ class PostService {
     }
 
     const {totalReaction} = await mediaModel.findOne({_id: mediaId}, {totalReaction: 1}).lean();
+    NotificationService.notify({
+      from: userId, to: mediaDocs.userId, type: NotificationType.Reaction, payload: {
+        media, mediaId, reaction: react
+      }
+    });
     return totalReaction;
   }
 

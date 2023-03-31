@@ -1,10 +1,11 @@
 const UserModel = require("../user/UserModel");
-const {AccountState, FriendRequestState} = require("../../utils/Constant");
+const {AccountState, FriendRequestState, NotificationType} = require("../../utils/Constant");
 const RequestModel = require("./RequestModel");
 const {DateTime} = require("luxon");
 const {httpError} = require("../../utils/HttpError");
 const ConversationModel = require("../conversation/ConversationModel");
 const MessageModel = require("../message/MessageModel");
+const {NotificationService} = require("../notifications/NotificationService");
 
 class RequestService {
 
@@ -138,6 +139,8 @@ class RequestService {
         }
       }
     });
+
+    NotificationService.notify({from: userId, to: request.from, type: NotificationType.FriendAccept})
 
     return {conversation}
   }
