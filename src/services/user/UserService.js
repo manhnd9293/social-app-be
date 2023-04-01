@@ -9,6 +9,9 @@ const MessageModel = require("../message/MessageModel");
 const {utils} = require("../../utils/utils");
 const fs = require("fs");
 const {AwsS3} = require("../../config/aws/s3/s3Config");
+const {NotificationModel} = require("../notifications/NotificationModel");
+const {ObjectId} = require('mongoose').Types;
+
 
 
 class UserService {
@@ -19,7 +22,62 @@ class UserService {
       {... defaultPopulate, ...fields})
       .lean();
 
-    return user;
+    const unreadNotifications = await NotificationModel.count({
+      to: id,
+      seen: false
+    })
+
+    const ans = await ConversationModel.aggregate([
+      {
+        $match: {
+          participants: {$all: [new ObjectId(id)]}
+        }
+      },
+      {
+        $lookup: {
+          from: 'messages',
+          localField: '_id',
+          foreignField: 'conversationId',
+          pipeline: [
+            {
+              $match: {
+                from: {$ne: new ObjectId(id)}
+              }
+            }
+          ],
+          as: 'messages'
+        }
+      },
+      {
+        $unwind: '$messages'
+      },
+      {
+        $match: {
+          'messages.seen': {
+            $not:           {
+              $elemMatch: {
+                $eq: ObjectId(id)
+              }
+            }
+
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: {$sum: 1}
+        }
+      }
+    ]) ;
+    const [{total: unreadMessages}] = ans.length > 0 ? ans : [{total: 0}]
+    const unreadInvitations = await RequestModel.count({
+      to: id,
+      seen: false,
+      state: FriendRequestState.Pending
+    })
+
+    return {...user, unreadNotifications, unreadMessages, unreadInvitations};
   }
   async login(username, password) {
     const user = await UserModel.findOne({username});

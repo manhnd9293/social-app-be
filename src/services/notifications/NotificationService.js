@@ -8,7 +8,7 @@ class NotificationService {
       return;
     }
     const check = await NotificationModel.findOne({
-      from, to, type, seen: false, 'payload.media': payload.media, 'payload.mediaId': payload.mediaId
+      from, to, type, seen: false, 'payload.media': payload?.media, 'payload.mediaId': payload?.mediaId
     }).lean();
     if (check) {
       return;
