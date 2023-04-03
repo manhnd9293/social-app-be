@@ -826,6 +826,27 @@
         }
       }
     },
+    "/post/{id}/comments": {
+      "get": {
+        "tags": [
+          "Post"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/news-feed/": {
       "get": {
         "tags": [

@@ -70,7 +70,7 @@ router.patch('/un-reaction', verifyToken, async (req, res, next) => {
   }
 });
 
-router.post('/comment', verifyToken,async (req, res, next) => {
+router.post('/comment', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['Post']
 
   try {
@@ -78,6 +78,18 @@ router.post('/comment', verifyToken,async (req, res, next) => {
     const {userId} = req;
     await PostService.comment(userId, content, mediaId, mediaType);
     res.status(201).json({data: {message: 'comment success'}});
+  } catch (e) {
+    next(e)
+  }
+});
+
+router.get('/:id/comments', async (req, res, next) => {
+  // #swagger.tags = ['Post']
+
+  try {
+    const {id} = req.params;
+    const comments = await PostService.getComments(id);
+    res.status(200).json({data: comments});
   } catch (e) {
     next(e)
   }

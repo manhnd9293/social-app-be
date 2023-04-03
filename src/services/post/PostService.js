@@ -265,6 +265,29 @@ class PostService {
       userId: commentUserId
     });
   }
+
+  async getComments(id) {
+    const comments = await CommentModel.find({
+      mediaType: Media.Post,
+      mediaId: id,
+      isDeleted: {$ne: true}
+    }, {
+      userId: 1,
+      content: 1,
+      totalReaction: 1,
+      date: 1
+    }, {
+      populate: [
+        {path: 'userId', select: {fullName: 1, avatar: 1}}
+      ],
+      sort: {
+        date: -1
+      }
+    },
+).lean();
+
+    return comments;
+  }
 }
 
 module.exports = {PostService: new PostService()}
