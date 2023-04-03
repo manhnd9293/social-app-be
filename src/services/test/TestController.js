@@ -18,8 +18,8 @@ router.get('', async (req, res) => {
 
   res.json({
     items: data,
-    hasNext: lastIdNumber < maxId ? true : false
+    hasNext: lastIdNumber < maxId - 10 ? true : false
   });
-})
+});
 
 module.exports = {TestController: router};
