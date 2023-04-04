@@ -67,4 +67,11 @@ const NotificationType = {
   Comment: 'comment'
 }
 
-module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType}
+const Relation = {
+  Friend: 'friend',
+  Stranger: 'stranger',
+  SentRequest: 'sent-request',
+  ReceiveRequest: 'receive-request'
+}
+
+module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType, Relation}

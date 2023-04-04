@@ -28,7 +28,7 @@ router.get('/me',verifyToken ,async (req, res) => {
   // #swagger.tags = ['User']
 
   const {userId} = req;
-  UserService.getUser(userId, {avatar: 1}).then(data => {
+  UserService.getCurrentUser(userId, {avatar: 1}).then(data => {
     res.send({data});
   })
 })
@@ -53,15 +53,12 @@ router.get('/:id/profile', verifyToken, async (req, res, next) => {
   const {userId} = req;
 
   try {
-    const user = await UserService.getUser(id, {avatar: 1});
-    const currentUser = await UserService.getUser(userId, {friends: 1});
-    const currentUserFriendIds = currentUser.friends.map(friend => friend.friendId.toString());
-    const isFriend = currentUserFriendIds.includes(user._id.toString());
-    user.isFriend = isFriend;
+    const user = await UserService.getUserProfile(id);
+    const relation = await UserService.getRelationWithCurrentUser(userId, id);
 
     res.status(200).json({
-      data: user
-    })
+      data: {...user, relation}
+    });
   } catch (e) {
     next(e);
   }

@@ -6,6 +6,7 @@ let friendSchema = new Schema({
     conversationId: {type: Schema.Types.ObjectId, ref: 'Conversation'},
     date: {type: Date, default: Date.now}
 });
+
 const userSchema = new Schema({
   username: {type: String, required: true, maxLength: 10, minLength: 3},
   password: {type: String, required: true},
@@ -14,6 +15,12 @@ const userSchema = new Schema({
   state: {type: String, default: AccountState.Pending},
   onlineState: {type: String, default: OnlineState.Offline},
   friends: [friendSchema],
+
+  dob: {type: Date},
+  currentLocation: {type: String},
+  hometown: {type: String},
+  bio: {type: String, maxLength: 101},
+  maritalStatus: {type: String}
 
 })
 

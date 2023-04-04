@@ -2,7 +2,7 @@ const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const { httpError} = require("../../utils/HttpError");
-const {AccountState, FriendRequestState} = require("../../utils/Constant");
+const {AccountState, FriendRequestState, Relation, Media} = require("../../utils/Constant");
 const RequestModel = require("../request/RequestModel");
 const ConversationModel = require("../conversation/ConversationModel");
 const MessageModel = require("../message/MessageModel");
@@ -10,18 +10,17 @@ const {utils} = require("../../utils/utils");
 const fs = require("fs");
 const {AwsS3} = require("../../config/aws/s3/s3Config");
 const {NotificationModel} = require("../notifications/NotificationModel");
+const {PostModel} = require("../post/PostModel");
 const {ObjectId} = require('mongoose').Types;
 
 
 
 class UserService {
-  async getUser(id, fields) {
-    const defaultPopulate = {username: 1, fullName: 1}
+  async getCurrentUser(id) {
     const user = await UserModel.findOne(
       {_id: id},
-      {... defaultPopulate, ...fields})
+      {avatar: 1, fullName: 1})
       .lean();
-
     const unreadNotifications = await NotificationModel.count({
       to: id,
       seen: false
@@ -78,7 +77,144 @@ class UserService {
     })
 
     return {...user, unreadNotifications, unreadMessages, unreadInvitations};
+
   }
+
+  async getUserProfile(id) {
+    const response = await UserModel.aggregate([
+      {
+        $match: {_id: ObjectId(id)}
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'friends.friendId',
+          foreignField: '_id',
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                fullName: 1,
+                avatar: 1
+              }
+            }
+          ],
+          as: 'friendList'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          fullName: 1,
+          avatar: 1,
+          friendList: 1
+        }
+      }
+    ]);
+
+    const recentPhotos = await this.getRecentPhotos(id, 9);
+
+    return response.length > 0 ? {...response[0], recentPhotos} : {};
+  }
+
+  async getRecentPhotos(userId, numbers) {
+    const recentPhotos = await PostModel.aggregate([
+      {
+        $match: {
+          userId: ObjectId(userId),
+          isDeleted: {$ne: true},
+          $expr: {
+            $or: [
+              {
+                $ne: [{$ifNull: ['$photo', -1]}, -1]
+              },
+              {$gt: [{$size: {$ifNull: ['$photoPosts', []]}}, 0]}
+            ]
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: 'photoposts',
+          localField: 'photoPosts',
+          foreignField: '_id',
+          as: 'photoList'
+        }
+      },
+      {
+        $project: {
+          photo: 1,
+          photoList: {
+            $cond: [
+              {
+                $gt: [{$size: '$photoList'}, 0]
+              },
+              '$photoList',
+              [-1]
+            ]
+          },
+          date: 1,
+        }
+      },
+      {
+        $unwind: '$photoList'
+      },
+      {
+        $project: {
+          url: {$ifNull: ['$photo', '$photoList.url']},
+          postPhotoId: {
+            $cond: [
+              {$ne: [{$ifNull: ['$photo', -1]}, -1]},
+              '-1',
+              '$photoList._id'
+            ]
+          },
+          media: {
+            $cond: [
+              {$ne: [{$ifNull: ['$photo', -1]}, -1]},
+              Media.Post,
+              Media.Photo
+            ]
+          },
+          date: 1
+        }
+      },
+      {
+        $sort: {date: -1}
+      },
+      {
+        $limit: numbers
+      }
+    ]);
+
+    return recentPhotos;
+  }
+
+  async getRelationWithCurrentUser(currentUserId, userId) {
+    const currentUser = await UserModel.findOne({_id: currentUserId}).lean();
+
+    if (currentUser.friends.map(f => f.friendId.toString()).includes(userId.toString())) {
+      return Relation.Friend;
+    }
+
+    const sentRequest = await RequestModel.findOne({
+      from: currentUserId, to: userId, state: FriendRequestState.Pending
+    }).lean();
+    if (sentRequest) {
+      return Relation.SentRequest;
+    }
+    const receiveRequest = await RequestModel.findOne({
+      from: userId, to: currentUserId, state: FriendRequestState.Pending
+    });
+    if (receiveRequest) {
+      return Relation.ReceiveRequest;
+    }
+
+    return Relation.Stranger;
+  }
+
+
+
   async login(username, password) {
     const user = await UserModel.findOne({username});
     if (!user) {
