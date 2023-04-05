@@ -6,15 +6,22 @@ const {ObjectId} = require('mongoose').Types;
 
 class NewFeedService {
   async getNewFeeds(userId, page) {
+    const currentUsers = await UserModel.findOne({_id: userId}, {friends: 1}).lean();
+    const friendsIds = currentUsers.friends.map(f => new ObjectId(f.friendId));
+    const userIdsToGet = [new ObjectId(userId), ...friendsIds];
+    const posts = await this.getPosts(userId, userIdsToGet, page);
+    return posts;
+  }
+
+  async getPosts(userId, userIds, page) {
     if (page < 0) {
       throw httpError.badRequest('Invalid page number');
     }
-    const currentUsers = await UserModel.findOne({_id: userId}, {friends: 1}).lean();
-    const friendsIds = currentUsers.friends.map(f => new ObjectId(f.friendId));
+
     const posts = await PostModel.aggregate([
       {
         $match: {
-          userId: {$in: [new ObjectId(userId), ...friendsIds]},
+          userId: {$in: userIds},
           isDeleted: {$ne: true}
         }
       },
@@ -61,7 +68,7 @@ class NewFeedService {
           ],
           as: 'comments'
         }
-      }, //todo: add lookup for photos post url
+      },
       {
         $lookup: {
           from: 'photoposts',

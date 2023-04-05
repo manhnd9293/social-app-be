@@ -71,7 +71,8 @@ const Relation = {
   Friend: 'friend',
   Stranger: 'stranger',
   SentRequest: 'sent-request',
-  ReceiveRequest: 'receive-request'
+  ReceiveRequest: 'receive-request',
+  Me: 'me'
 }
 
 module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType, Relation}

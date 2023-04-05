@@ -11,6 +11,7 @@ const fs = require("fs");
 const {AwsS3} = require("../../config/aws/s3/s3Config");
 const {NotificationModel} = require("../notifications/NotificationModel");
 const {PostModel} = require("../post/PostModel");
+const {NewFeedService} = require("../newFeed/NewFeedService");
 const {ObjectId} = require('mongoose').Types;
 
 
@@ -191,6 +192,9 @@ class UserService {
   }
 
   async getRelationWithCurrentUser(currentUserId, userId) {
+    if (currentUserId.toString() === userId.toString()) {
+      return Relation.Me;
+    }
     const currentUser = await UserModel.findOne({_id: currentUserId}).lean();
 
     if (currentUser.friends.map(f => f.friendId.toString()).includes(userId.toString())) {
@@ -449,6 +453,11 @@ class UserService {
     });
 
     return data;
+  }
+
+  async getTimeline(userId, profileId ,page) {
+    const posts = await NewFeedService.getPosts(userId, [new ObjectId(profileId)], page);
+    return posts;
   }
 }
 module.exports = {UserService: new UserService()}

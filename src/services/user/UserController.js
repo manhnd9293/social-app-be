@@ -136,18 +136,32 @@ router.get('/', verifyToken, async (req, res, next) => {
   }
 });
 
-router.patch('/avatar', verifyToken, uploadAvatar.single('file') ,async (req,res, next) => {
-    // #swagger.tags = ['User']
+router.patch('/avatar', verifyToken, uploadAvatar.single('file'), async (req, res, next) => {
+  // #swagger.tags = ['User']
 
-    try {
-      const {file} = req;
-      const {userId} = req;
-      const data = await UserService.updateAvatar(userId, file);
+  try {
+    const {file} = req;
+    const {userId} = req;
+    const data = await UserService.updateAvatar(userId, file);
 
-      res.status(200).json({data});
-    } catch (e) {
-      next(e)
-    }
+    res.status(200).json({data});
+  } catch (e) {
+    next(e)
+  }
+});
+
+
+router.get('/timeline',verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {page = 0, profileId} = req.query;
+    const {userId} = req;
+    const posts = await UserService.getTimeline(userId, profileId ,page);
+    res.status(200).json({data: posts});
+  } catch (e) {
+    next(e)
+  }
 })
 
 router.get('/test', async (req,res, next) => {
