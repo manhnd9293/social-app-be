@@ -71,13 +71,13 @@ class UserService {
       }
     ]) ;
     const [{total: unreadMessages}] = ans.length > 0 ? ans : [{total: 0}]
-    const unreadInvitations = await RequestModel.count({
+    const unseenInvitations = await RequestModel.countDocuments({
       to: id,
       seen: false,
       state: FriendRequestState.Pending
     })
 
-    return {...user, unreadNotifications, unreadMessages, unreadInvitations};
+    return {...user, unreadNotifications, unreadMessages, unseenInvitations};
 
   }
 
@@ -298,7 +298,7 @@ class UserService {
     let invites = await RequestModel.find({
       to: userId,
       state: FriendRequestState.Pending
-    }).populate({path: 'from', select: {avatar: 1, fullName: 1}});
+    }).populate({path: 'from', select: {avatar: 1, fullName: 1}}).sort({_id: -1}).lean();
 
     return invites;
   }
@@ -324,6 +324,7 @@ class UserService {
       friends: {
         friendId: 1,
         date: 1,
+        conversationId: 1
       }
     }).populate({path: 'friends.friendId', select: {avatar: 1, fullName: 1}});
 

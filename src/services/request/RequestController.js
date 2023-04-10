@@ -36,4 +36,20 @@ router.patch('/state', verifyToken, async (req, res, next) => {
   }
 });
 
+router.patch('/seen', verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['Request']
+
+  try {
+    const {unseenIds} = req.body;
+    const {userId} = req;
+
+    await RequestService.updateUnseenInvitations(userId, unseenIds);
+    const unseen = await RequestService.countUnseenInvitations(userId);
+
+    res.status(200).json({data: unseen})
+  } catch (e) {
+    next(e)
+  }
+})
+
 module.exports = {RequestController: router}

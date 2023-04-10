@@ -145,6 +145,29 @@ class RequestService {
     return {conversation}
   }
 
+  async updateUnseenInvitations(userId, unseenIds) {
+    const unseenRequests = await RequestModel.find({_id: {$in: unseenIds}}).lean();
+    if (unseenRequests.some(request => request.to.toString() !== userId)) {
+      throw httpError.badRequest('Invalid userId');
+    }
+
+    await RequestModel.updateMany({
+      _id: {$in: unseenIds}
+    }, {
+      $set: {
+        seen: true
+      }
+    })
+  }
+
+  async countUnseenInvitations(userId) {
+    const count = await RequestModel.countDocuments({
+      to: userId,
+      seen: false
+    });
+
+    return count;
+  }
 }
 
 module.exports = {RequestService: new RequestService()}
