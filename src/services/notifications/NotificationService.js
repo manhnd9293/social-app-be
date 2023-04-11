@@ -1,6 +1,7 @@
 const {NotificationModel} = require("./NotificationModel");
 const socketClient = require("../../config/socketClient");
 const UserModel = require("../user/UserModel");
+const {httpError} = require("../../utils/HttpError");
 
 class NotificationService {
   async notify({from, to, payload, type}) {
@@ -38,12 +39,28 @@ class NotificationService {
     return data;
   }
 
-  async updateSeen(notificationIds) {
+  async updateSeen(userId, notificationIds) {
+    const notifications = await NotificationModel.find({
+      _id: notificationIds
+    }, {to: 1}).lean();
+    if (notifications.some(notification => notification.to.toString() !== userId)) {
+      throw httpError.badRequest('User can not update some notifications');
+    }
     await NotificationModel.updateMany({
-      _id: {$in: notificationIds}
+      _id: {$in: notificationIds},
+      to: userId,
     }, {
       $set: {seen: true}
-    })
+    });
+  }
+
+  async countUnseenNotification(userId) {
+    const count = await NotificationModel.countDocuments({
+      to: userId,
+      seen: false
+    });
+
+    return count;
   }
 }
 

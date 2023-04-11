@@ -3,6 +3,8 @@ const {NotificationService} = require("./NotificationService");
 const router = require('express').Router();
 
 router.get('/', verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['Notifications']
+
   try {
     const {page = 0, offset = 0} = req.query;
     const {userId} = req;
@@ -15,12 +17,15 @@ router.get('/', verifyToken, async (req, res, next) => {
   }
 })
 
-router.patch('/seen', async (req, res, next) => {
-  // #swagger.tags = ['']
+router.patch('/seen',verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['Notifications']
   try {
-    const notificationIds = req.body;
-    await NotificationService.updateSeen(notificationIds);
-    res.status(200).json({message: 'success'});
+    const {notificationIds} = req.body;
+    const {userId} = req;
+    await NotificationService.updateSeen(userId, notificationIds);
+    const unseenNotifications = await NotificationService.countUnseenNotification(userId);
+
+    res.status(200).json({message: 'success', data: {unseen: unseenNotifications}});
   } catch (e) {
     next(e)
   }

@@ -987,9 +987,24 @@
     },
     "/notifications/seen": {
       "patch": {
-        "tags": [],
+        "tags": [
+          "Notifications"
+        ],
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "notificationIds": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
