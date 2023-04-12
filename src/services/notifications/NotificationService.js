@@ -20,8 +20,9 @@ class NotificationService {
     });
 
     const fromUser = await UserModel.findOne({_id: from}, {fullName: 1, avatar: 1}).lean();
+    const unseen = await NotificationModel.countDocuments({to, seen: false});
 
-    await socketClient.post('/socket-notification',{from: fromUser, to: to.toString(), payload, type} , {
+    await socketClient.post('/socket-notification',{from: fromUser, to: to.toString(), payload, type, unseen} , {
       headers: {
         'x-access-token': process.env.SOCKET_TOKEN
       }
