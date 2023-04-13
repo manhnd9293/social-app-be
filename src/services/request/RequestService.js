@@ -6,6 +6,7 @@ const {httpError} = require("../../utils/HttpError");
 const ConversationModel = require("../conversation/ConversationModel");
 const MessageModel = require("../message/MessageModel");
 const {NotificationService} = require("../notifications/NotificationService");
+const socketClient = require("../../config/socketClient");
 
 class RequestService {
 
@@ -44,20 +45,21 @@ class RequestService {
 
     const data =
       await RequestModel.populate(request, {path: 'from', select: {avatar: 1, fullName: 1}});
+    this.notifyNewFriendRequest({from, to, data})
 
     return data;
+  }
+
+  async updateFriendRequest(userId, requestId, state) {
+    const request = await RequestModel.findOne({
+      _id: requestId
+    }).lean();
+
+    if (!request) {
+      throw httpError.badRequest('Request not exist');
     }
 
-    async updateFriendRequest(userId, requestId, state) {
-      const request = await RequestModel.findOne({
-        _id: requestId
-      }).lean();
-
-      if (!request) {
-        throw httpError.badRequest('Request not exist');
-      }
-
-      const fromUser = await UserModel.findOne({_id: request.from}).lean();
+    const fromUser = await UserModel.findOne({_id: request.from}).lean();
     if (!fromUser) {
       throw httpError.badRequest('User not existed');
     }
@@ -167,6 +169,15 @@ class RequestService {
     });
 
     return count;
+  }
+
+  async notifyNewFriendRequest({from , to, data}){
+    const unseen = await RequestModel.countDocuments({to, seen: false, state: FriendRequestState.Pending})
+    await socketClient.post('/socket-friend-request',{from, to, data, unseen} , {
+      headers: {
+        'x-access-token': process.env.SOCKET_TOKEN
+      }
+    })
   }
 }
 

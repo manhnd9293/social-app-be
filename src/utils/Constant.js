@@ -64,7 +64,7 @@ const Media = {
 const NotificationType = {
   Reaction: 'reaction',
   FriendAccept: 'friend-accept',
-  Comment: 'comment'
+  Comment: 'comment',
 }
 
 const Relation = {
