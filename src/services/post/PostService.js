@@ -281,7 +281,7 @@ class PostService {
         {path: 'userId', select: {fullName: 1, avatar: 1}}
       ],
       sort: {
-        date: -1
+        date: 1
       }
     },
 ).lean();
