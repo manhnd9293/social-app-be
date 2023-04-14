@@ -9,6 +9,7 @@ const {PostController} = require("../../services/post/PostController");
 const {NewsFeedController} = require("../../services/newFeed/NewFeedController");
 const {TestController} = require("../../services/test/TestController");
 const {NotificationController} = require("../../services/notifications/NotificationController");
+const {MessageController} = require("../../services/message/MessageController");
 
 function configRoute(app) {
   // app.use((req, res, next) => {
@@ -22,7 +23,8 @@ function configRoute(app) {
   app.use('/request', RequestController);
   app.use('/post', PostController);
   app.use('/news-feed', NewsFeedController);
-  app.use('/notifications', NotificationController)
+  app.use('/notifications', NotificationController);
+  app.use('/messages', MessageController)
   if( ['dev', 'int'].includes(process.env.NODE_ENV)) {
     app.use('/test', TestController)
 

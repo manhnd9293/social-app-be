@@ -20,7 +20,7 @@ class UserService {
   async getCurrentUser(id) {
     const user = await UserModel.findOne(
       {_id: id},
-      {avatar: 1, fullName: 1})
+      {avatar: 1, fullName: 1, friends: 1})
       .lean();
     const unreadNotifications = await NotificationModel.count({
       to: id,
@@ -30,7 +30,7 @@ class UserService {
     const ans = await ConversationModel.aggregate([
       {
         $match: {
-          participants: {$all: [new ObjectId(id)]}
+          _id: {$in: user.friends.map(f => f.conversationId)}
         }
       },
       {
@@ -77,7 +77,7 @@ class UserService {
       state: FriendRequestState.Pending
     })
 
-    return {...user, unreadNotifications, unreadMessages, unseenInvitations};
+    return {...user, unreadNotifications, unreadMessages, unseenInvitations, friends: undefined};
 
   }
 
