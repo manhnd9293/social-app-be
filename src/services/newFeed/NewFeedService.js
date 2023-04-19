@@ -5,33 +5,27 @@ const {Media} = require("../../utils/Constant");
 const {ObjectId} = require('mongoose').Types;
 
 class NewFeedService {
-  async getNewFeeds(userId, page) {
+  async getNewFeeds(userId, lastId) {
     const currentUsers = await UserModel.findOne({_id: userId}, {friends: 1}).lean();
     const friendsIds = currentUsers.friends.map(f => new ObjectId(f.friendId));
     const userIdsToGet = [new ObjectId(userId), ...friendsIds];
-    const posts = await this.getPosts(userId, userIdsToGet, page);
+    const posts = await this.getPosts(userId, userIdsToGet, lastId);
     return posts;
   }
 
-  async getPosts(userId, userIds, page) {
-    if (page < 0) {
-      throw httpError.badRequest('Invalid page number');
-    }
-
+  async getPosts(userId, userIds, lastId) {
     const posts = await PostModel.aggregate([
       {
         $match: {
           userId: {$in: userIds},
-          isDeleted: {$ne: true}
+          isDeleted: {$ne: true},
+          ... lastId ? {_id: {$lt: new ObjectId(lastId)}} : {}
         }
       },
       {
         $sort: {
-          date: -1,
+          _id: -1,
         }
-      },
-      {
-        $skip: page
       },
       {
         $limit: 20

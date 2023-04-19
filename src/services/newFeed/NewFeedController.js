@@ -7,9 +7,9 @@ router.get('/',verifyToken, async (req, res, next) => {
   // #swagger.tags = ['New Feed']
 
   try {
-    const {page = 0} = req.query;
+    const {lastId} = req.query;
     const {userId} = req;
-    const posts = await NewFeedService.getNewFeeds(userId, Number(page));
+    const posts = await NewFeedService.getNewFeeds(userId, lastId);
     res.status(200).json({data: posts})
   } catch (e) {
     next(e);
