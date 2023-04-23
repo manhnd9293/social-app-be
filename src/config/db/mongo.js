@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.set('strictQuery', true);
-mongoose.set('debug', true)
+// mongoose.set('debug', true)
+
 async function connectDb() {
   try{
     let uri = '';

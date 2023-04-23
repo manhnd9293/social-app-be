@@ -9,8 +9,8 @@ router.get('/',verifyToken, async (req, res, next) => {
   try {
     const {lastId} = req.query;
     const {userId} = req;
-    const posts = await NewFeedService.getNewFeeds(userId, lastId);
-    res.status(200).json({data: posts})
+    const pagePost = await NewFeedService.getNewFeeds(userId, lastId);
+    res.status(200).json({data: pagePost})
   } catch (e) {
     next(e);
   }

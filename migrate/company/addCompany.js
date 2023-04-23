@@ -82,7 +82,7 @@ async function addCompany() {
 
 addCompany().then(() => {
   console.log('migrate data successfully');
-  process.exit()
+  process.exit();
 }).catch(e => {
   console.log('Fail to migrate data');
   process.exit();

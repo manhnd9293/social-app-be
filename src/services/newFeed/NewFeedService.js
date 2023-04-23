@@ -9,12 +9,12 @@ class NewFeedService {
     const currentUsers = await UserModel.findOne({_id: userId}, {friends: 1}).lean();
     const friendsIds = currentUsers.friends.map(f => new ObjectId(f.friendId));
     const userIdsToGet = [new ObjectId(userId), ...friendsIds];
-    const posts = await this.getPosts(userId, userIdsToGet, lastId);
-    return posts;
+    const pagePost = await this.getPosts(userId, userIdsToGet, lastId);
+    return pagePost;
   }
 
   async getPosts(userId, userIds, lastId) {
-    const posts = await PostModel.aggregate([
+    const [{remained, nextPage: posts}] = await PostModel.aggregate([
       {
         $match: {
           userId: {$in: userIds},
@@ -23,77 +23,93 @@ class NewFeedService {
         }
       },
       {
-        $sort: {
-          _id: -1,
-        }
-      },
-      {
-        $limit: 20
-      },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'byUsers'
-        }
-      },
-      {
-        $addFields: {
-          byUser: {$arrayElemAt: ['$byUsers', 0]}
-        }
-      },
-      {
-        $lookup: {
-          from: 'comments',
-          let: {media_id: '$_id'},
-          pipeline: [
+        $facet: {
+          'remained': [
             {
-              $match: {
-                $expr: {
-                  $and: [
-                    {$eq: ['$mediaType', 'post']},
-                    {$eq: ['$mediaId', '$$media_id']},
-                    {$ne: ['$isDeleted', true]}
-                  ]
+              $group: {
+                _id: null,
+                total: {
+                  $sum: 1
                 }
               }
             }
           ],
-          as: 'comments'
-        }
-      },
-      {
-        $lookup: {
-          from: 'photoposts',
-          foreignField: '_id',
-          localField: 'photoPosts',
-          pipeline: [
+          'nextPage': [
+            {
+              $sort: {
+                _id: -1,
+              }
+            },
+            {
+              $limit: 20
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'byUsers'
+              }
+            },
+            {
+              $addFields: {
+                byUser: {$arrayElemAt: ['$byUsers', 0]}
+              }
+            },
+            {
+              $lookup: {
+                from: 'comments',
+                let: {media_id: '$_id'},
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          {$eq: ['$mediaType', 'post']},
+                          {$eq: ['$mediaId', '$$media_id']},
+                          {$ne: ['$isDeleted', true]}
+                        ]
+                      }
+                    }
+                  }
+                ],
+                as: 'comments'
+              }
+            },
+            {
+              $lookup: {
+                from: 'photoposts',
+                foreignField: '_id',
+                localField: 'photoPosts',
+                pipeline: [
+                  {
+                    $project: {
+                      _id: 1,
+                      url: 1,
+                      caption: 1
+                    }
+                  }
+                ],
+                as: 'photoPostList'
+              }
+            },
             {
               $project: {
                 _id: 1,
-                url: 1,
-                caption: 1
+                content: 1,
+                totalReaction: 1,
+                date: 1,
+                comments: {$size: '$comments'},
+                'byUser.fullName':1,
+                'byUser._id':1,
+                'byUser.avatar':1,
+                photo: 1,
+                photoPosts: '$photoPostList',
               }
             }
-          ],
-          as: 'photoPostList'
+          ]
         }
       },
-      {
-        $project: {
-          _id: 1,
-          content: 1,
-          totalReaction: 1,
-          date: 1,
-          comments: {$size: '$comments'},
-          'byUser.fullName':1,
-          'byUser._id':1,
-          'byUser.avatar':1,
-          photo: 1,
-          photoPosts: '$photoPostList',
-        }
-      }
     ]);
 
     const postIds = posts.map(post => post._id);
@@ -111,7 +127,9 @@ class NewFeedService {
       }
     })
 
-    return posts;
+    const hasMore = remained.length > 0 && remained[0].total > posts.length;
+
+    return {posts, hasMore};
   }
 }
 
