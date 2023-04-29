@@ -75,4 +75,17 @@ const Relation = {
   Me: 'me'
 }
 
-module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType, Relation}
+const EducationLevel = {
+  HighSchool: 'high-school',
+  College: 'college',
+}
+
+const Relationship = {
+  Single: 'single',
+  InARelationship: 'in-a-relationship',
+  Married: 'married',
+  Complicated: 'complicated',
+  Other: 'other'
+}
+
+module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType, Relation, EducationLevel, Relationship}

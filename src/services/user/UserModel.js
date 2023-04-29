@@ -7,6 +7,40 @@ let friendSchema = new Schema({
     date: {type: Date, default: Date.now}
 });
 
+const educationSchema = new Schema({
+  show: {type: Boolean, default: true},
+  name: {type: String, maxLength: 100},
+  level: {type: String},
+  from: {type: String},
+  to: {type: String}
+})
+
+const relationshipSchema = new Schema({
+  show: {type: Boolean, default: true},
+  state: {type: String}
+})
+
+const homeTownSchema = new Schema({
+  show: {type: Boolean},
+  name: {type: String}
+})
+
+const currentCitySchema = new Schema({
+  show: {type: Boolean},
+  name: {type: String}
+})
+
+const dobSchema = new Schema({
+  show: {type: Boolean},
+  date: {type: Date}
+})
+
+const workSchema = new Schema({
+  show: {type: Boolean},
+  company: {type: String},
+  title: {type: String}
+})
+
 const userSchema = new Schema({
   username: {type: String, required: true, maxLength: 10, minLength: 3},
   password: {type: String, required: true},
@@ -16,12 +50,13 @@ const userSchema = new Schema({
   onlineState: {type: String, default: OnlineState.Offline},
   friends: [friendSchema],
 
-  dob: {type: Date},
-  currentLocation: {type: String},
-  hometown: {type: String},
+  dob: {type: dobSchema},
   bio: {type: String, maxLength: 101},
-  maritalStatus: {type: String}
-
+  relationship: {type: relationshipSchema},
+  educations: {type: [educationSchema]},
+  hometown: {type: homeTownSchema},
+  currentCity: {type: currentCitySchema},
+  works: {type: [workSchema]}
 })
 
 const UserModel = model('User', userSchema);
