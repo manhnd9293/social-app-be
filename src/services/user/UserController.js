@@ -165,12 +165,27 @@ router.get('/timeline',verifyToken, async (req, res, next) => {
 })
 
 router.get('/test', async (req,res, next) => {
-    // #swagger.tags = ['']
+    // #swagger.tags = ['User']
 
     try {
       res.status(200).json({data: 1});
     } catch (e) {
       next(e)
     }
+})
+
+router.patch('/about',verifyToken , async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const update = req.body;
+    const {userId} = req;
+
+    const data = await UserService.mutateAboutData(userId, update);
+
+    res.status(200).json({message: 'update succeed',...data});
+  } catch (e) {
+    next(e)
+  }
 })
 module.exports = {UserController: router}

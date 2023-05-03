@@ -37,8 +37,13 @@ const dobSchema = new Schema({
 
 const workSchema = new Schema({
   show: {type: Boolean},
-  company: {type: String},
-  title: {type: String}
+  company: {type: String, maxLength: 50},
+  position: {type: String, maxLength: 50},
+  city: {type: String, maxLength: 10},
+  description: {type: String, maxLength: 300},
+  fromYear: {type: Number},
+  toYear: {type: Number},
+  isPresent: {type: Boolean},
 })
 
 const userSchema = new Schema({

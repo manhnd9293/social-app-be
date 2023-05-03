@@ -460,5 +460,90 @@ class UserService {
     const posts = await NewFeedService.getPosts(userId, [new ObjectId(profileId)], page);
     return posts;
   }
+
+  async mutateAboutData(userId, operation) {
+    const action = Object.keys(operation)[0];
+    if(!action) {
+      throw httpError.badRequest('No action found');
+    }
+    const updateData = operation[action];
+    const field = Object.keys(updateData)[0];
+    if (!field) {
+      throw httpError.badRequest(`update field is required`);
+    }
+
+    const data = updateData[field];
+    if (!data) {
+      throw httpError.badRequest(`No update data found`);
+    }
+
+    switch (action) {
+      case 'add':
+        return await this.addAboutInfo(userId, field, data);
+      case 'update':
+        return await this.updateAboutInfo(userId, field, data);
+      case 'delete':
+        return await this.deleteAboutInfo(userId, field, data);
+      default:
+        throw httpError.badRequest('Invalid action');
+    }
+  }
+
+  async addAboutInfo(userId, field, data) {
+    await UserModel.updateOne({
+        _id: userId
+      },
+      {
+        $push: {
+          [field]: data
+        }
+      });
+
+    const res = await UserModel.findOne({
+      _id: userId
+    }, {
+      [field]: 1,
+    }).lean();
+    const latest = res[field][res[field].length -1];
+    return {_id: latest._id};
+  }
+
+  async updateAboutInfo(userId, field, data) {
+    const _id = data._id;
+    if (!_id) {
+      throw httpError.badRequest('_id field is required');
+    }
+    await UserModel.updateOne({
+      _id: userId,
+      [field]: {
+        $elemMatch: {
+          _id
+        }
+      }
+    }, {
+      $set: {
+        [`${field}.$`]: data
+      }
+    });
+
+  }
+
+  async deleteAboutInfo(userId, field, data) {
+    const _id = data?._id;
+    if (!_id) {
+      throw httpError.badRequest(`_id field is required`);
+    }
+
+    await UserModel.updateOne({
+      _id: userId,
+    },
+      {
+        $pull: {
+          [field]: {
+            _id
+          }
+        }
+      })
+  }
 }
 module.exports = {UserService: new UserService()}
