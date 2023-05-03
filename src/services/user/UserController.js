@@ -183,7 +183,7 @@ router.patch('/about',verifyToken , async (req, res, next) => {
 
     const data = await UserService.mutateAboutData(userId, update);
 
-    res.status(200).json({message: 'update succeed',...data});
+    res.status(200).json({message: 'update succeed',data});
   } catch (e) {
     next(e)
   }

@@ -108,7 +108,8 @@ class UserService {
           _id: 1,
           fullName: 1,
           avatar: 1,
-          friendList: 1
+          friendList: 1,
+          works: 1
         }
       }
     ]);
