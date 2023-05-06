@@ -2,7 +2,7 @@ const UserModel = require("./UserModel");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const { httpError} = require("../../utils/HttpError");
-const {AccountState, FriendRequestState, Relation, Media} = require("../../utils/Constant");
+const {AccountState, FriendRequestState, Relation, Media, MutationAction} = require("../../utils/Constant");
 const RequestModel = require("../request/RequestModel");
 const ConversationModel = require("../conversation/ConversationModel");
 const MessageModel = require("../message/MessageModel");
@@ -109,7 +109,8 @@ class UserService {
           fullName: 1,
           avatar: 1,
           friendList: 1,
-          works: 1
+          works: 1,
+          hometown: 1
         }
       }
     ]);
@@ -479,18 +480,20 @@ class UserService {
     }
 
     switch (action) {
-      case 'add':
-        return await this.addAboutInfo(userId, field, data);
-      case 'update':
+      case MutationAction.Push:
+        return await this.pushAboutInfo(userId, field, data);
+      case MutationAction.Update:
         return await this.updateAboutInfo(userId, field, data);
-      case 'delete':
+      case MutationAction.Pull:
+        return await this.pullAboutInfo(userId, field, data);
+      case MutationAction.Delete:
         return await this.deleteAboutInfo(userId, field, data);
       default:
         throw httpError.badRequest('Invalid action');
     }
   }
 
-  async addAboutInfo(userId, field, data) {
+  async pushAboutInfo(userId, field, data) {
     await UserModel.updateOne({
         _id: userId
       },
@@ -510,26 +513,41 @@ class UserService {
   }
 
   async updateAboutInfo(userId, field, data) {
-    const _id = data._id;
-    if (!_id) {
-      throw httpError.badRequest('_id field is required');
-    }
-    await UserModel.updateOne({
-      _id: userId,
-      [field]: {
-        $elemMatch: {
-          _id
-        }
-      }
-    }, {
-      $set: {
-        [`${field}.$`]: data
-      }
-    });
+    const fieldInstance = UserModel.schema.path(field)?.instance;
 
+    if(fieldInstance === 'Array') {
+      const _id = data._id;
+
+      if (!_id) {
+        throw httpError.badRequest('_id field is required');
+      }
+
+      await UserModel.updateOne({
+        _id: userId,
+        [field]: {
+          $elemMatch: {
+            _id
+          }
+        }
+      }, {
+        $set: {
+          [`${field}.$`]: data
+        }
+      });
+
+    } else if(fieldInstance === 'String' || fieldInstance === 'Embedded') {
+
+      await UserModel.updateOne({
+        _id: userId,
+      }, {
+        $set: {
+          [field]: data
+        }
+      })
+    }
   }
 
-  async deleteAboutInfo(userId, field, data) {
+  async pullAboutInfo(userId, field, data) {
     const _id = data?._id;
     if (!_id) {
       throw httpError.badRequest(`_id field is required`);
@@ -546,5 +564,17 @@ class UserService {
         }
       })
   }
+
+  async deleteAboutInfo(userId, field) {
+    await UserModel.updateOne({
+        _id: userId
+      },
+      {
+        $set: {
+          [field]: null
+        }
+      })
+  }
+
 }
 module.exports = {UserService: new UserService()}

@@ -88,4 +88,12 @@ const Relationship = {
   Other: 'other'
 }
 
-module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType, Relation, EducationLevel, Relationship}
+const MutationAction = {
+  Create: 'create',
+  Update: 'update',
+  Push: 'push',
+  Pull: 'pull',
+  Delete: 'delete'
+}
+
+module.exports = {AccountState, FriendRequestState, Industry, Province, OnlineState, Reaction, Media, NotificationType, Relation, EducationLevel, Relationship, MutationAction}
