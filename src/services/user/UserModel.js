@@ -25,7 +25,7 @@ const homeTownSchema = new Schema({
   name: {type: String}
 })
 
-const currentCitySchema = new Schema({
+const PlaceSchema = new Schema({
   show: {type: Boolean},
   name: {type: String}
 })
@@ -60,7 +60,7 @@ const userSchema = new Schema({
   relationship: {type: relationshipSchema},
   educations: {type: [educationSchema]},
   hometown: {type: homeTownSchema},
-  currentCity: {type: currentCitySchema},
+  currentPlace: {type: PlaceSchema},
   works: {type: [workSchema]}
 })
 

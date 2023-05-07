@@ -110,7 +110,8 @@ class UserService {
           avatar: 1,
           friendList: 1,
           works: 1,
-          hometown: 1
+          hometown: 1,
+          currentPlace: 1
         }
       }
     ]);
