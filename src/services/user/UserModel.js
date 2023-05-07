@@ -17,7 +17,7 @@ const educationSchema = new Schema({
 
 const relationshipSchema = new Schema({
   show: {type: Boolean, default: true},
-  state: {type: String}
+  name: {type: String}
 })
 
 const homeTownSchema = new Schema({

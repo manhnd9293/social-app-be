@@ -111,7 +111,8 @@ class UserService {
           friendList: 1,
           works: 1,
           hometown: 1,
-          currentPlace: 1
+          currentPlace: 1,
+          relationship: 1
         }
       }
     ]);
