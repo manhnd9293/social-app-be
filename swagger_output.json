@@ -387,6 +387,14 @@
             "description": "OK"
           }
         }
+      },
+      "post": {
+        "tags": [
+          "test endpoint"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/user/about": {

@@ -188,4 +188,14 @@ router.patch('/about',verifyToken , async (req, res, next) => {
     next(e)
   }
 })
+
+router.post('/test', async (req, res, next) => {
+  // #swagger.tags = ['test endpoint']
+
+  try {
+
+  } catch (e) {
+    next(e)
+  }
+})
 module.exports = {UserController: router}

@@ -478,7 +478,7 @@ class UserService {
     }
 
     const data = updateData[field];
-    if (!data) {
+    if (data === null || data === undefined) {
       throw httpError.badRequest(`No update data found`);
     }
 
