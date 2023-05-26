@@ -36,6 +36,7 @@ class PostService {
     });
 
     const user = await UserModel.findOne({_id: userId});
+    const postResponse = {};
     if(photoFiles.length === 1) {
       const file =  photoFiles[0];
       const {path} = file;
@@ -49,8 +50,9 @@ class PostService {
           photo: location
         }
       });
+      postResponse.photo = location;
     } else if(photoFiles.length > 1) {
-      const photoPostIds = [];
+      const photoPosts = [];
       for (let i=0; i< photoFiles.length; i++) {
         const file = photoFiles[i];
         const caption = captions[i];
@@ -65,18 +67,24 @@ class PostService {
           _id: photoPost._id
         }, {
           $set: {
-            url: uploadData.location
+            url: uploadData.location,
           }
         });
-        photoPostIds.push(photoPost._id);
+        photoPosts.push({
+            _id: photoPost._id,
+            url: uploadData.location,
+          }
+        );
       }
       await PostModel.updateOne({
         _id: post._id
       }, {
         $set: {
-          photoPosts: photoPostIds
+          photoPosts: photoPosts.map(post => post._id)
         }
       })
+
+      postResponse.photoPosts = photoPosts;
     }
 
     const unlinkPromises = [];
@@ -89,7 +97,7 @@ class PostService {
     })
 
     this.updateFriendsNewFeed(userId, post.toObject());
-    return post;
+    return {...post.toObject(), ...postResponse};
   }
 
   async updateFriendsNewFeed(userId, post) {
