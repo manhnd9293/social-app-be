@@ -189,6 +189,18 @@ router.patch('/about',verifyToken , async (req, res, next) => {
   }
 })
 
+router.patch('/intro/visible', async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {userId} = req;
+    const visibleUpdateData = req.body;
+    await UserService.updateVisibleData(userId, visibleUpdateData);
+  } catch (e) {
+    next(e)
+  }
+})
+
 router.post('/test', async (req, res, next) => {
   // #swagger.tags = ['test endpoint']
 

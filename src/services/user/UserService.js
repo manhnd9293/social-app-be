@@ -579,5 +579,55 @@ class UserService {
       })
   }
 
+  async updateVisibleData(userId, visibleUpdateData) {
+    const {work, educations, currentCity, hometown, relationship} = visibleUpdateData;
+    let singleFieldUpdateObject = {};
+    if(currentCity !== null){
+      singleFieldUpdateObject = {...singleFieldUpdateObject, ...{currentPlace: {show: currentCity}}}
+    }
+    if(hometown !== null) {
+      singleFieldUpdateObject = {...singleFieldUpdateObject, ...{hometown: {show: hometown}}};
+    }
+    if (relationship !== null) {
+      singleFieldUpdateObject = {...singleFieldUpdateObject, ...{relationship: {show: relationship}}};
+    }
+
+    await UserModel.updateOne({
+      _id: userId
+    }, {
+      $set: singleFieldUpdateObject
+    });
+    if (work !== null) {
+      await UserModel.updateOne({
+        _id: userId,
+        works: {
+          $elemMatch: {
+            _id: work._id
+          }
+        }
+      }, {
+        $set: {
+          'works.$.show': work.show
+        }
+      });
+    }
+
+    if(educations !== null) {
+      for (const education of educations) {
+        await UserModel.updateOne({
+          _id: userId,
+          educations: {
+            $elemMatch: {
+              _id: education._id
+            }
+          }
+        }, {
+          $set: {
+            "educations.$.show": education.show,
+          }
+        })
+      }
+    }
+  }
 }
 module.exports = {UserService: new UserService()}

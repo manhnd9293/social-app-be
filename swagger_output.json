@@ -423,6 +423,16 @@
         }
       }
     },
+    "/user/intro/visible": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
     "/company/industries": {
       "get": {
         "tags": [
