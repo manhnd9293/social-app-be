@@ -9,12 +9,11 @@ class HttpError extends Error {
     return new HttpError({status: 400, message});
   }
   unauthorize(message) {
-    return new HttpError({status: 401, message: message || 'You are not allow to do this action'});
+    return new HttpError({status: 403, message: message || 'You are not allow to do this action'});
   }
 }
 
 function errorHandler(err, req, res, next) {
-
   console.log(err.stack);
 
   if(err instanceof HttpError) {
@@ -27,15 +26,14 @@ function errorHandler(err, req, res, next) {
         status: status || 500,
         message: (message || 'Some thing went wrong')
       });
-    next();
-    return;
-  }
+  } else {
+    // handle system error
+    res.status(500).json({
+      status: 500,
+      message: 'Something went wrong'
+    })
 
-  // handle system error
-  res.status(500).json({
-    status: 500,
-    message: 'Something went wrong'
-  })
+  }
 
 }
 

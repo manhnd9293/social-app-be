@@ -5,12 +5,10 @@ const {utils} = require("../../utils/utils");
 const router = Router();
 
 router.get('/', verifyToken, async (req, res, next) => {
-  // #swagger.tags = ['User']
-
+  // #swagger.tags = ['Conversation']
   try{
     const {userId} = req;
     const conversations = await ConversationService.getConversationList(userId);
-
     res.json({
       data: conversations
     })
@@ -20,14 +18,22 @@ router.get('/', verifyToken, async (req, res, next) => {
 })
 
 router.get('/:id',verifyToken ,  async (req, res, next) => {
-  const {userId} = req;
-  const {id: conversationId} = req.params;
-  let data = await ConversationService.getConversationDetail(userId, conversationId);
+  // #swagger.tags = ['Conversation']
 
-  res.status(200).json({data})
+  try {
+    const {userId} = req;
+    const {id: conversationId} = req.params;
+    let data = await ConversationService.getConversationDetail(userId, conversationId);
+
+    res.status(200).json({data});
+  } catch (e) {
+    next(e);
+  }
 })
 
 router.get('/:id/messages',verifyToken ,  async (req, res, next) => {
+  // #swagger.tags = ['Conversation']
+
   try {
     const {userId} = req;
     const {id: conversationId} = req.params;

@@ -16,7 +16,7 @@ class ConversationService {
       }
     ).populate(
       [
-        {path: 'friends.friendId', select: {fullName: 1, avatar: 1}},
+        {path: 'friends.friendId', select: {fullName: 1, avatar: 1, onlineState: 1}},
         {
           path: 'friends.conversationId',
           select: {
@@ -29,8 +29,8 @@ class ConversationService {
         },
       ]
     ).lean()
-    conversationList.friends.sort((a, b) => b.conversationId.lastMessageId.date - a.conversationId.lastMessageId.date);
 
+    conversationList.friends.sort((a, b) => b.conversationId.lastMessageId.date - a.conversationId.lastMessageId.date);
     return conversationList;
 
   }
@@ -44,7 +44,7 @@ class ConversationService {
       throw httpError.unauthorize('Not allow to get message data of this conversation');
     }
 
-    let messages = MessageModel.find({
+    let messages = await MessageModel.find({
       conversationId
     }).populate([
       {
@@ -55,7 +55,12 @@ class ConversationService {
         }
       }]).sort({
       date: 1
-    }).skip(offset || 0);
+    }).skip(offset || 0).lean();
+
+    messages.forEach(m => {
+      const seen = m.seen.map(id => id.toString()).includes(userId) ? true : false;
+      m.seen = seen;
+    })
 
     return messages
 
@@ -69,7 +74,8 @@ class ConversationService {
         path: 'participants',
         select: {
           fullName: 1,
-          avatar: 1
+          avatar: 1,
+          onlineState: 1
         }
       }
     ).lean();

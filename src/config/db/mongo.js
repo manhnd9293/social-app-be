@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 mongoose.set('strictQuery', true);
+// mongoose.set('debug', true)
 
 async function connectDb() {
   try{
@@ -7,7 +8,7 @@ async function connectDb() {
     if(process.env.NODE_ENV === 'production'){
       uri = process.env.DB_CONNECTION_STRING
     } else {
-      uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?authSource=admin`;
+      uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?authSource=admin`;
     }
     await mongoose.connect(
       uri,

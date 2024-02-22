@@ -2,23 +2,26 @@ version: '3.8'
 
 volumes:
   test_bulma_data:
-    name: test_bulma_data
+    name: huni_local_data
 
 services:
-  be:
-    image: be-local
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: local
-      DB_HOST: mongo
-    ports:
-      - '6000:5000'
-    depends_on:
-      - mongo
+#  be:
+#    build: .
+#    image: be-huni
+#    container_name: be-huni
+#    env_file:
+#      - .env
+#    environment:
+#      NODE_ENV: local
+#      DB_HOST: mongo
+#    ports:
+#      - '6000:5000'
+#    depends_on:
+#      - mongo
+
   mongo:
     image: mongo
-    container_name: test_bulma_db
+    container_name: huni_local_db
     restart: 'always'
     env_file:
       - .env

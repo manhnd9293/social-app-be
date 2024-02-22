@@ -1,5 +1,6 @@
 const {UserService} = require("./UserService");
 const {verifyToken} = require("../../middlewares/jwtAuth");
+const {uploadAvatar} = require("../../config/uploadFile");
 const router = require('express').Router();
 
 router.post('/sign-in', async (req, res, next) => {
@@ -27,7 +28,7 @@ router.get('/me',verifyToken ,async (req, res) => {
   // #swagger.tags = ['User']
 
   const {userId} = req;
-  UserService.getUser(userId, {avatar: 1}).then(data => {
+  UserService.getCurrentUser(userId, {avatar: 1}).then(data => {
     res.send({data});
   })
 })
@@ -45,19 +46,6 @@ router.get('/check-username-exist', async (req,res) => {
   })
 })
 
-router.get('/test', async (req, res, next) => {
-  // #swagger.tags = ['User']
-
-  UserService.testError().then(()=>{
-    res.json({
-      data: 'success'
-    })
-  }).catch(e =>{
-    next(e);
-  });
-
-})
-
 router.get('/:id/profile', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
 
@@ -65,19 +53,17 @@ router.get('/:id/profile', verifyToken, async (req, res, next) => {
   const {userId} = req;
 
   try {
-    const user = await UserService.getUser(id, {avatar: 1});
-    const currentUser = await UserService.getUser(userId, {friends: 1});
-    const currentUserFriendIds = currentUser.friends.map(friend => friend.friendId.toString());
-    const isFriend = currentUserFriendIds.includes(user._id.toString());
-    user.isFriend = isFriend;
+    const user = await UserService.getUserProfile(id);
+    const relation = await UserService.getRelationWithCurrentUser(userId, id);
 
     res.status(200).json({
-      data: user
-    })
+      data: {...user, relation}
+    });
   } catch (e) {
     next(e);
   }
 })
+
 router.get('/invitations', verifyToken, async (req,res, next) => {
   // #swagger.tags = ['User']
   try {
@@ -91,7 +77,7 @@ router.get('/invitations', verifyToken, async (req,res, next) => {
   }
 })
 
-router.get('/sent-requests', verifyToken, async (req,res, next) => {
+router.get('/sent-requests', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
   try {
     const {userId} = req;
@@ -102,22 +88,24 @@ router.get('/sent-requests', verifyToken, async (req,res, next) => {
   } catch (e) {
     next(e)
   }
-})
-
-router.patch('/friend-request', verifyToken, async (req, res, next) => {
-  // #swagger.tags = ['User']
-  try {
-    const {requestId, state} = req.body;
-    const {userId} = req;
-    await UserService.updateFriendRequest(userId, requestId, state);
-    res.status(200).json({
-        message: 'update successfully'
-      }
-    )
-  } catch (e) {
-    next(e);
-  }
 });
+
+
+
+router.patch('/unfriend', verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {userId} = req;
+    const {unfriendId} = req.body;
+    await UserService.unfriend(userId, unfriendId);
+    res.status(200).json({
+      message: 'unfriend success'
+    })
+  } catch (e) {
+    next(e)
+  }
+})
 
 router.get('/friends-list', verifyToken, async (req, res, next) => {
   // #swagger.tags = ['User']
@@ -130,6 +118,96 @@ router.get('/friends-list', verifyToken, async (req, res, next) => {
     })
   } catch (e) {
     next(e);
+  }
+})
+
+router.get('/', verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['User']
+  try {
+    const {search} = req.query;
+    const {userId} = req;
+    const users = await UserService.getUsers({search, userId});
+
+    res.json({
+      data: users
+    })
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.patch('/avatar', verifyToken, uploadAvatar.single('file'), async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {file} = req;
+    const {userId} = req;
+    const data = await UserService.updateAvatar(userId, file);
+
+    res.status(200).json({data});
+  } catch (e) {
+    next(e)
+  }
+});
+
+
+router.get('/timeline',verifyToken, async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {page = 0, profileId} = req.query;
+    const {userId} = req;
+    const posts = await UserService.getTimeline(userId, profileId ,page);
+    res.status(200).json({data: posts});
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get('/test', async (req,res, next) => {
+    // #swagger.tags = ['User']
+
+    try {
+      res.status(200).json({data: 1});
+    } catch (e) {
+      next(e)
+    }
+})
+
+router.patch('/about',verifyToken , async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const update = req.body;
+    const {userId} = req;
+
+    const data = await UserService.mutateAboutData(userId, update);
+
+    res.status(200).json({message: 'update succeed',data});
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.patch('/intro/visible', async (req, res, next) => {
+  // #swagger.tags = ['User']
+
+  try {
+    const {userId} = req;
+    const visibleUpdateData = req.body;
+    await UserService.updateVisibleData(userId, visibleUpdateData);
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.post('/test', async (req, res, next) => {
+  // #swagger.tags = ['test endpoint']
+
+  try {
+
+  } catch (e) {
+    next(e)
   }
 })
 module.exports = {UserController: router}
