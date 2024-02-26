@@ -1,3 +1,5 @@
+// This line must come before importing any instrumented module.
+const tracer = require('dd-trace').init()
 const express = require("express");
 require('dotenv').config();
 const {connectDb} = require("./config/db/mongo");
@@ -5,7 +7,6 @@ require('./config/uploadFile')
 const { configRoute } = require("./config/routes");
 const cors = require('cors');
 const {errorHandler} = require("./utils/HttpError");
-
 
 const app = express();
 app.use(express.json());
