@@ -13,23 +13,24 @@ function configRoute(app) {
   //   console.log(`${DateTime.now()}: ${req.method} - url: ${req.originalUrl}`)
   //   next();
   // })
-
-  app.use('/user', UserController)
-  app.use('/company', companyController);
-  app.use('/conversations', ConversationController);
-  app.use('/request', RequestController);
-  app.use('/post', PostController);
-  app.use('/news-feed', NewsFeedController);
-  app.use('/notifications', NotificationController);
-  app.use('/messages', MessageController)
+  const router = require('express').Router();
+  app.use('/api', router)
+  router.use('/user', UserController)
+  router.use('/company', companyController);
+  router.use('/conversations', ConversationController);
+  router.use('/request', RequestController);
+  router.use('/post', PostController);
+  router.use('/news-feed', NewsFeedController);
+  router.use('/notifications', NotificationController);
+  router.use('/messages', MessageController)
   if( ['dev', 'int'].includes(process.env.NODE_ENV)) {
-    app.use('/test', TestController)
+    router.use('/test', TestController)
 
 
     const swaggerFile = require('../../../swagger_output.json');
     const swaggerUi = require('swagger-ui-express');
 
-    app.use( '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+    router.use( '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
   }
 
 }
