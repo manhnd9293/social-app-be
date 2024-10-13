@@ -1,0 +1,11 @@
+services:
+  proxy:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - /etc/nginx/nginx.conf:./nginx.conf
+    networks:
+
+networks:
+  social-app-network:

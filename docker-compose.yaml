@@ -1,38 +1,19 @@
-version: '3.8'
-
-volumes:
-  test_bulma_data:
-    name: huni_local_data
-
 services:
-#  be:
-#    build: .
-#    image: be-huni
-#    container_name: be-huni
-#    env_file:
-#      - .env
-#    environment:
-#      NODE_ENV: local
-#      DB_HOST: mongo
-#    ports:
-#      - '6000:5000'
-#    depends_on:
-#      - mongo
-
-  mongo:
-    image: mongo
-    container_name: huni_local_db
-    restart: 'always'
+  social-be:
+    image: manhnd9293/social-be:latest
+    restart: always
+    container_name: social-be
+    networks:
+      - social-app-network
     env_file:
       - .env
-    volumes:
-      - test_bulma_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: ${DB_NAME}
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - '27017:27017'
+  social-fe:
+    image: manhnd9293/social-fe:latest
+    restart: always
+    container_name: social-fe
+    networks:
+      - social-app-network
 
-
- 
+networks:
+  social-app-network:
+    driver: bridge
