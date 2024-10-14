@@ -2,6 +2,7 @@ const UserModel = require("../user/UserModel");
 const ConversationModel = require("./ConversationModel");
 const {httpError} = require("../../utils/HttpError");
 const MessageModel = require("../message/MessageModel");
+const {ObjectId} = require('mongoose').Types;
 
 class ConversationService {
 
@@ -28,7 +29,55 @@ class ConversationService {
           }
         },
       ]
-    ).lean()
+    ).lean();
+    const conversationIds = conversationList.friends.map(friend => friend.conversationId._id);
+
+    const aggregateUnreadMessage = await ConversationModel.aggregate([
+      {
+        $match: {
+          _id: {$in: conversationIds}
+        }
+      },
+      {
+        $lookup: {
+          from: 'messages',
+          localField: '_id',
+          foreignField: 'conversationId',
+          pipeline: [
+            {
+              $match: {
+                from: {$ne: new ObjectId(userId)}
+              }
+            }
+          ],
+          as: 'messages'
+        }
+      },
+      {
+        $unwind: '$messages'
+      },
+      {
+        $match: {
+          'messages.seen': {
+            $not:           {
+              $elemMatch: {
+                $eq: new ObjectId(userId)
+              }
+            }
+
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$_id',
+          total: {$sum: 1}
+        }
+      }
+    ]) ;
+    const conversationIdToUnSeenMessage = new Map();
+    aggregateUnreadMessage.forEach(result => conversationIdToUnSeenMessage.set(result._id.toString(), result.total))
+    conversationList.friends.forEach(f => f.conversationId.unReadMessages = conversationIdToUnSeenMessage.get(f.conversationId._id.toString()) || 0);
 
     conversationList.friends.sort((a, b) => b.conversationId.lastMessageId.date - a.conversationId.lastMessageId.date);
     return conversationList;

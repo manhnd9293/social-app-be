@@ -54,9 +54,9 @@ class UserService {
       {
         $match: {
           'messages.seen': {
-            $not:           {
+            $not: {
               $elemMatch: {
-                $eq: ObjectId(id)
+                $eq: new ObjectId(id)
               }
             }
 
