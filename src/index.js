@@ -7,7 +7,7 @@ require('./config/uploadFile')
 const { configRoute } = require("./config/routes");
 const cors = require('cors');
 const {errorHandler} = require("./utils/HttpError");
-import {rateLimit} from 'express-rate-limit';
+const {rateLimit} = require('express-rate-limit');
 
 const app = express();
 app.use(express.json());
