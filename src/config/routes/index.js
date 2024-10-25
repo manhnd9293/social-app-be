@@ -23,6 +23,7 @@ function configRoute(app) {
   router.use('/news-feed', NewsFeedController);
   router.use('/notifications', NotificationController);
   router.use('/messages', MessageController)
+
   if( ['dev', 'int'].includes(process.env.NODE_ENV)) {
     router.use('/test', TestController)
 
@@ -32,6 +33,8 @@ function configRoute(app) {
 
     router.use( '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
   }
+  router.get('/ip', (request, response) => response.send(request.ip));
+  router.get('/x-forwarded-for', (request, response) => response.send(request.headers['x-forwarded-for']));
 
 }
 
